@@ -1,0 +1,53 @@
+{% extends "prompts/base.html" %}
+
+{% block title %}All Prompts - AI Prompts Manager{% endblock %}
+
+{% block content %}
+    <div class="filter-bar">
+        <form method="get" style="display: flex; gap: 15px; flex: 1;">
+            <input type="text" name="search" placeholder="Search prompts..." value="{{ search_query }}">
+            <select name="category">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}" {% if selected_category == category.id|stringformat:"s" %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{% url 'prompt_list' %}" class="btn btn-secondary">Clear</a>
+        </form>
+    </div>
+
+    {% if prompts %}
+        {% for prompt in prompts %}
+            <div class="card prompt-card {% if prompt.is_favorite %}favorite{% endif %}">
+                <h3 class="prompt-title">
+                    {% if prompt.is_favorite %}⭐ {% endif %}
+                    <a href="{% url 'prompt_detail' prompt.pk %}">{{ prompt.title }}</a>
+                </h3>
+                <div class="prompt-meta">
+                    {% if prompt.category %}Category: {{ prompt.category.name }} | {% endif %}
+                    Created: {{ prompt.created_at|date:"M d, Y H:i" }}
+                </div>
+                <div class="prompt-content">{{ prompt.content|truncatewords:30 }}</div>
+                {% if prompt.tags %}
+                    <div style="margin-top: 10px;">
+                        {% for tag in prompt.get_tags_list %}
+                            <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="actions">
+                    <a href="{% url 'prompt_detail' prompt.pk %}" class="btn btn-primary">View</a>
+                    <a href="{% url 'prompt_edit' prompt.pk %}" class="btn btn-secondary">Edit</a>
+                    <a href="{% url 'prompt_delete' prompt.pk %}" class="btn btn-danger">Delete</a>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="card">
+            <p>No prompts found. <a href="{% url 'prompt_create' %}">Create your first prompt!</a></p>
+        </div>
+    {% endif %}
+{% endblock %}
