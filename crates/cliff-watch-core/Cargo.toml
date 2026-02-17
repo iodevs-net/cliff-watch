@@ -5,11 +5,14 @@ edition.workspace = true
 description = "Core logic for Cliff-Watch Sovereign Proof of Human Work & Focus protocol."
 
 [features]
-default = ["ast-analysis"]
+default = []
 # Activar para usar el backend legacy que lee /dev/input (requiere root)
 legacy-evdev = ["evdev"]
 # [NEW v5.2] Análisis sintáctico profundo (pesado)
 ast-analysis = ["syn"]
+# Advanced cryptographic features (optional for non-intrusive mode)
+zkp = ["bulletproofs"]
+tpm = ["tss-esapi"]
 
 [dependencies]
 # Workspace dependencies inherited
@@ -28,11 +31,11 @@ anyhow = { workspace = true }
 # Randomness for key generation
 rand = "0.8"
 
-# Advanced Crypto v3.0
-bulletproofs = "5.0"
+# Advanced Crypto v3.0 (optional features)
+bulletproofs = { version = "5.0", optional = true }
 curve25519-dalek = { workspace = true, features = ["serde", "rand_core"] }
 merlin = { workspace = true }
-tss-esapi = "7.5"
+tss-esapi = { version = "7.5", optional = true }
 syn = { version = "2.0", features = ["full"], optional = true } # Para análisis sintáctico
 
 # Async runtime and utilities

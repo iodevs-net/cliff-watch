@@ -1,0 +1,209 @@
+<common_patterns>
+  <pattern name="extract_function">
+    <description>Extract repeated logic into a reusable function</description>
+    <when_to_use>DRY violations, duplicate code blocks</when_to_use>
+    <example language="typescript">
+      <before>
+// DRY violation - repeated logic
+function processUserA(user: User): Result<string> {
+  if (user.isActive && user.hasPermission) {
+    return { success: true, data: `User ${user.name} is valid` };
+  } else {
+    return { success: false, error: "Invalid user" };
+  }
+}
+
+function processUserB(user: User): Result<string> {
+  if (user.isActive && user.hasPermission) {
+    return { success: true, data: `User ${user.name} is valid` };
+  } else {
+    return { success: false, error: "Invalid user" };
+  }
+}
+      </before>
+      <after>
+// DRY - extracted common logic
+function validateUser(user: User): Result<string> {
+  if (user.isActive && user.hasPermission) {
+    return { success: true, data: `User ${user.name} is valid` };
+  } else {
+    return { success: false, error: "Invalid user" };
+  }
+}
+
+function processUserA(user: User): Result<string> {
+  return validateUser(user);
+}
+
+function processUserB(user: User): Result<string> {
+  return validateUser(user);
+}
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="interface_abstraction">
+    <description>Use interfaces for polymorphism (SOLID Open/Closed)</description>
+    <when_to_use>Multiple implementations of similar behavior</when_to_use>
+    <example language="typescript">
+      <before>
+// Violates Open/Closed - requires modification for new types
+function processData(data: Data): string {
+  switch (data.type) {
+    case "text":
+      return `Text: ${data.value}`;
+    case "number":
+      return `Number: ${data.value}`;
+    // Must modify here for new types
+    default:
+      return "Unknown";
+  }
+}
+      </before>
+      <after>
+// Open/Closed - extensible without modification
+interface Processable {
+  process(): string;
+}
+
+class TextData implements Processable {
+  constructor(private value: string) {}
+  process(): string {
+    return `Text: ${this.value}`;
+  }
+}
+
+class NumberData implements Processable {
+  constructor(private value: number) {}
+  process(): string {
+    return `Number: ${this.value}`;
+  }
+}
+
+function processData(data: Processable): string {
+  return data.process();
+}
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="discriminated_union">
+    <description>Use discriminated unions for type-safe state</description>
+    <when_to_use>Representing different states or variants</when_to_use>
+    <example language="typescript">
+      <before>
+// Type-unsafe state representation
+type State = {
+  status: "loading" | "success" | "error";
+  data?: string;
+  error?: string;
+};
+
+function handleState(state: State) {
+  if (state.status === "success") {
+    // TypeScript doesn't know data is defined
+    console.log(state.data?.toUpperCase());
+  }
+}
+      </before>
+      <after>
+// Type-safe discriminated union
+type State =
+  | { status: "loading" }
+  | { status: "success"; data: string }
+  | { status: "error"; error: string };
+
+function handleState(state: State) {
+  if (state.status === "success") {
+    // TypeScript knows data is defined
+    console.log(state.data.toUpperCase());
+  }
+}
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="functional_array_methods">
+    <description>Use functional array methods instead of loops</description>
+    <when_to_use>Transforming or filtering arrays</when_to_use>
+    <example language="typescript">
+      <before>
+// Imperative loop
+function filterAndMap(numbers: number[]): number[] {
+  const result: number[] = [];
+  for (const n of numbers) {
+    if (n > 0) {
+      result.push(n * 2);
+    }
+  }
+  return result;
+}
+      </before>
+      <after>
+// Functional methods - more idiomatic
+function filterAndMap(numbers: number[]): number[] {
+  return numbers
+    .filter(n => n > 0)
+    .map(n => n * 2);
+}
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="type_guard">
+    <description>Use type guards for runtime type checking</description>
+    <when_to_use>Narrowing types at runtime</when_to_use>
+    <example language="typescript">
+      <before>
+// Unsafe type assertion
+function processValue(value: unknown): string {
+  return (value as string).toUpperCase();
+}
+      </before>
+      <after>
+// Type-safe type guard
+function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
+function processValue(value: unknown): string {
+  if (isString(value)) {
+    return value.toUpperCase();
+  }
+  throw new Error("Value is not a string");
+}
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="dependency_injection">
+    <description>Use dependency injection for testability (SOLID)</description>
+    <when_to_use>Services that need external dependencies</when_to_use>
+    <example language="typescript">
+      <before>
+// Hard dependency - hard to test
+class UserService {
+  async getUser(id: string): Promise<User> {
+    const response = await fetch(`/api/users/${id}`);
+    return response.json();
+  }
+}
+      </before>
+      <after>
+// Dependency injection - testable
+interface HttpClient {
+  get(url: string): Promise<unknown>;
+}
+
+class UserService {
+  constructor(private http: HttpClient) {}
+
+  async getUser(id: string): Promise<User> {
+    const response = await this.http.get(`/api/users/${id}`);
+    return response as User;
+  }
+}
+      </after>
+    </example>
+  </pattern>
+</common_patterns>

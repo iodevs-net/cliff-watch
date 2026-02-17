@@ -72,6 +72,6 @@ mod tests {
     fn normalized_entropy_in_unit_range() {
         let data = b"some test data";
         let e = normalized_entropy(data);
-        assert!(e >= 0.0 && e <= 1.0);
+        assert!((0.0..=1.0).contains(&e));
     }
 }

@@ -1,7 +1,4 @@
 use tss_esapi::{Context, TctiNameConf};
-use tss_esapi::interface_types::resource_handles::Hierarchy;
-use tss_esapi::structures::SymmetricDefinition;
-use tss_esapi::attributes::SessionAttributesBuilder;
 use std::sync::{Arc, Mutex};
 
 /// Abstracción para el chip TPM 2.0

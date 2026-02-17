@@ -1,0 +1,124 @@
+<best_practices>
+  <general_principles>
+    <principle priority="high">
+      <name>DRY - Don't Repeat Yourself</name>
+      <description>Eliminate code duplication through abstraction and reuse</description>
+      <rationale>Duplicated code increases maintenance burden and bug risk</rationale>
+      <example>
+        <scenario>Multiple functions with similar logic</scenario>
+        <good>Extract common logic into a helper function or utility</good>
+        <bad>Copy-paste code with minor variations</bad>
+      </example>
+    </principle>
+
+    <principle priority="high">
+      <name>SOLID - Single Responsibility</name>
+      <description>Each module/function should have one reason to change</description>
+      <rationale>Improves maintainability and testability</rationale>
+      <example>
+        <scenario>A function that validates, processes, and saves data</scenario>
+        <good>Split into separate validation, processing, and persistence functions</good>
+        <bad>Keep all logic in one monolithic function</bad>
+      </example>
+    </principle>
+
+    <principle priority="high">
+      <name>SOLID - Open/Closed</name>
+      <description>Open for extension, closed for modification</description>
+      <rationale>Allows adding features without breaking existing code</rationale>
+      <example>
+        <scenario>Adding new protocol handlers</scenario>
+        <good>Use interfaces and dependency injection for extensibility</good>
+        <bad>Modify existing switch statements with new cases everywhere</bad>
+      </example>
+    </principle>
+
+    <principle priority="medium">
+      <name>LEAN - Eliminate Waste</name>
+      <description>Remove unnecessary code, abstractions, and complexity</description>
+      <rationale>Waste increases cognitive load and maintenance cost</rationale>
+      <example>
+        <scenario>Unused functions and dead code</scenario>
+        <good>Remove unused code immediately</good>
+        <bad>Keep "just in case" code</bad>
+      </example>
+    </principle>
+
+    <principle priority="high">
+      <name>KISS - Keep It Simple, Stupid</name>
+      <description>Prefer simple solutions over complex ones</description>
+      <rationale>Complexity is the enemy of maintainability</rationale>
+      <example>
+        <scenario>A simple object lookup vs. a complex factory pattern</scenario>
+        <good>Use simple object when it meets requirements</good>
+        <bad>Over-engineer with unnecessary patterns</bad>
+      </example>
+    </principle>
+  </general_principles>
+
+  <typescript_specific_practices>
+    <practice category="types">
+      <rule>Leverage TypeScript's type system</rule>
+      <guidelines>
+        <guideline>Use strict mode in tsconfig.json</guideline>
+        <guideline>Avoid 'any' type - use 'unknown' for dynamic data</guideline>
+        <guideline>Use discriminated unions for type-safe state</guideline>
+        <guideline>Prefer 'interface' for object shapes, 'type' for unions</guideline>
+        <guideline>Use generics for reusable components</guideline>
+      </guidelines>
+    </practice>
+
+    <practice category="async">
+      <rule>Handle async operations correctly</rule>
+      <guidelines>
+        <guideline>Use async/await instead of Promise chains</guideline>
+        <guideline>Handle errors with try/catch</guideline>
+        <guideline>Avoid mixing callbacks and promises</guideline>
+        <guideline>Use Promise.all for parallel operations</guideline>
+      </guidelines>
+    </practice>
+
+    <practice category="modules">
+      <rule>Organize modules effectively</rule>
+      <guidelines>
+        <guideline>Keep modules small and focused</guideline>
+        <guideline>Use barrel exports (index.ts) for clean imports</guideline>
+        <guideline>Avoid circular dependencies</guideline>
+        <guideline>Use named exports for better tree-shaking</guideline>
+      </guidelines>
+    </practice>
+
+    <practice category="patterns">
+      <rule>Follow TypeScript idioms and conventions</rule>
+      <guidelines>
+        <guideline>Use functional programming patterns (map, filter, reduce)</guideline>
+        <guideline>Use optional chaining (?.) and nullish coalescing (??)</guideline>
+        <guideline>Use type guards for runtime type checking</guideline>
+        <guideline>Prefer composition over inheritance</guideline>
+      </guidelines>
+    </practice>
+  </typescript_specific_practices>
+
+  <quality_checklist>
+    <category name="before_refactoring">
+      <item>Understand the existing code's purpose</item>
+      <item>Identify all principle violations</item>
+      <item>Check test coverage</item>
+      <item>Review dependencies and imports</item>
+    </category>
+
+    <category name="during_refactoring">
+      <item>Apply principles incrementally</item>
+      <item>Keep tests passing after each change</item>
+      <item>Document non-obvious decisions</item>
+      <item>Review for new violations introduced</item>
+    </category>
+
+    <category name="after_refactoring">
+      <item>Run TypeScript compiler (tsc)</item>
+      <item>Run linter (eslint)</item>
+      <item>Verify all tests pass</item>
+      <item>Check for type errors</item>
+    </category>
+  </quality_checklist>
+</best_practices>

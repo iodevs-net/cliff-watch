@@ -1,0 +1,244 @@
+<common_patterns>
+  <pattern name="extract_function">
+    <description>Extract repeated logic into a reusable function</description>
+    <when_to_use>DRY violations, duplicate code blocks</when_to_use>
+    <example language="rust">
+      <before>
+// DRY violation - repeated logic
+fn process_user_a(user: &User) -> Result<String> {
+    if user.is_active() && user.has_permission() {
+        Ok(format!("User {} is valid", user.name))
+    } else {
+        Err("Invalid user".into())
+    }
+}
+
+fn process_user_b(user: &User) -> Result<String> {
+    if user.is_active() && user.has_permission() {
+        Ok(format!("User {} is valid", user.name))
+    } else {
+        Err("Invalid user".into())
+    }
+}
+      </before>
+      <after>
+// DRY - extracted common logic
+fn validate_user(user: &User) -> Result<String> {
+    if user.is_active() && user.has_permission() {
+        Ok(format!("User {} is valid", user.name))
+    } else {
+        Err("Invalid user".into())
+    }
+}
+
+fn process_user_a(user: &User) -> Result<String> {
+    validate_user(user)
+}
+
+fn process_user_b(user: &User) -> Result<String> {
+    validate_user(user)
+}
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="trait_abstraction">
+    <description>Use traits for polymorphism (SOLID Open/Closed)</description>
+    <when_to_use>Multiple implementations of similar behavior</when_to_use>
+    <example language="rust">
+      <before>
+// Violates Open/Closed - requires modification for new types
+fn process_data(data: Data) -> String {
+    match data {
+        Data::Text(s) => format!("Text: {}", s),
+        Data::Number(n) => format!("Number: {}", n),
+        // Must modify here for new variants
+    }
+}
+      </before>
+      <after>
+// Open/Closed - extensible without modification
+trait Processable {
+    fn process(&self) -> String;
+}
+
+impl Processable for String {
+    fn process(&self) -> String {
+        format!("Text: {}", self)
+    }
+}
+
+impl Processable for i64 {
+    fn process(&self) -> String {
+        format!("Number: {}", self)
+    }
+}
+
+fn process_data<T: Processable>(data: &T) -> String {
+    data.process()
+}
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="builder_pattern">
+    <description>Builder pattern for complex construction (KISS)</description>
+    <when_to_use>Complex objects with many optional parameters</when_to_use>
+    <example language="rust">
+      <before>
+// Complex constructor - hard to read
+fn create_config(
+    host: String,
+    port: u16,
+    timeout: Option<u64>,
+    retries: Option<u32>,
+    tls: Option<bool>,
+) -> Config {
+    Config {
+        host,
+        port,
+        timeout: timeout.unwrap_or(30),
+        retries: retries.unwrap_or(3),
+        tls: tls.unwrap_or(true),
+    }
+}
+      </before>
+      <after>
+// Builder pattern - clear and flexible
+struct ConfigBuilder {
+    host: String,
+    port: u16,
+    timeout: u64,
+    retries: u32,
+    tls: bool,
+}
+
+impl ConfigBuilder {
+    fn new(host: String, port: u16) -> Self {
+        Self {
+            host,
+            port,
+            timeout: 30,
+            retries: 3,
+            tls: true,
+        }
+    }
+
+    fn timeout(mut self, timeout: u64) -> Self {
+        self.timeout = timeout;
+        self
+    }
+
+    fn retries(mut self, retries: u32) -> Self {
+        self.retries = retries;
+        self
+    }
+
+    fn tls(mut self, tls: bool) -> Self {
+        self.tls = tls;
+        self
+    }
+
+    fn build(self) -> Config {
+        Config {
+            host: self.host,
+            port: self.port,
+            timeout: self.timeout,
+            retries: self.retries,
+            tls: self.tls,
+        }
+    }
+}
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="iterator_chain">
+    <description>Use iterator chains instead of loops (Rust idiom)</description>
+    <when_to_use>Transforming or filtering collections</when_to_use>
+    <example language="rust">
+      <before>
+// Imperative loop
+fn filter_and_map(numbers: &[i32]) -> Vec<i32> {
+    let mut result = Vec::new();
+    for n in numbers {
+        if n > 0 {
+            result.push(n * 2);
+        }
+    }
+    result
+}
+      </before>
+      <after>
+// Iterator chain - more idiomatic
+fn filter_and_map(numbers: &[i32]) -> Vec<i32> {
+    numbers
+        .iter()
+        .filter(|&&n| n > 0)
+        .map(|&n| n * 2)
+        .collect()
+}
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="newtype_pattern">
+    <description>Create newtypes for type safety (SOLID)</description>
+    <when_to_use>Prevent mixing of logically distinct values</when_to_use>
+    <example language="rust">
+      <before>
+// Type confusion risk
+fn connect(host: String, port: u16) { /* ... */ }
+
+fn main() {
+    connect("localhost".to_string(), 8080);
+    // Easy to accidentally swap arguments
+}
+      </before>
+      <after>
+// Type-safe newtypes
+#[derive(Debug, Clone)]
+struct Host(String);
+
+#[derive(Debug, Clone)]
+struct Port(u16);
+
+fn connect(host: Host, port: Port) { /* ... */ }
+
+fn main() {
+    connect(Host("localhost".to_string()), Port(8080));
+    // Compiler catches swapped arguments
+}
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="result_combinator">
+    <description>Use Result combinators for error handling</description>
+    <when_to_use>Chaining operations that can fail</when_to_use>
+    <example language="rust">
+      <before>
+// Nested match statements
+fn process(input: &str) -> Result<String, Error> {
+    let parsed = match parse(input) {
+        Ok(v) => v,
+        Err(e) => return Err(e),
+    };
+    let validated = match validate(parsed) {
+        Ok(v) => v,
+        Err(e) => return Err(e),
+    };
+    Ok(format!("{:?}", validated))
+}
+      </before>
+      <after>
+// Result combinators - cleaner
+fn process(input: &str) -> Result<String, Error> {
+    parse(input)
+        .and_then(validate)
+        .map(|v| format!("{:?}", v))
+}
+      </after>
+    </example>
+  </pattern>
+</common_patterns>

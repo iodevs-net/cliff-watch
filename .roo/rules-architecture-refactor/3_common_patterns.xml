@@ -1,0 +1,105 @@
+<common_patterns>
+  <pattern name="module_separation">
+    <description>Separate concerns into distinct modules</description>
+    <when_to_use>Single module has multiple responsibilities</when_to_use>
+    <example>
+      <before>
+// Single module with multiple concerns
+// monitor.rs handles: monitoring, validation, persistence, UI
+      </before>
+      <after>
+// Separated modules
+// monitor.rs - handles monitoring logic only
+// validator.rs - handles validation
+// persistence.rs - handles data storage
+// ui.rs - handles user interface
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="interface_boundary">
+    <description>Define clear interfaces between modules</description>
+    <when_to_use>Modules need to communicate with each other</when_to_use>
+    <example>
+      <before>
+// Direct coupling between modules
+// Daemon directly calls Monitor internals
+      </before>
+      <after>
+// Interface boundary
+// Daemon depends on Monitor trait
+// Monitor implements Monitor trait
+// Modules communicate through defined interface
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="repository_pattern">
+    <description>Abstract data access behind repository interface</description>
+    <when_to_use>Business logic needs to access data</when_to_use>
+    <example>
+      <before>
+// Business logic directly calls storage
+// EntropyCalculator directly writes to disk
+      </before>
+      <after>
+// Repository pattern
+// EntropyCalculator depends on StorageRepository trait
+// DiskStorage implements StorageRepository
+// MemoryStorage implements StorageRepository for testing
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="event_driven">
+    <description>Use events for loose coupling</description>
+    <when_to_use>Modules need to react to state changes</when_to_use>
+    <example>
+      <before>
+// Tight coupling through direct calls
+// Monitor directly calls UI to update display
+      </before>
+      <after>
+// Event-driven architecture
+// Monitor emits events (BatteryChanged, FocusStateChanged)
+// UI subscribes to events
+// Modules are decoupled
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="layered_architecture">
+    <description>Organize code into distinct layers</description>
+    <when_to_use>Application has multiple concerns</when_to_use>
+    <example>
+      <before>
+// Mixed concerns
+// Functions mix business logic, storage, and presentation
+      </before>
+      <after>
+// Layered architecture
+// Presentation layer - handles UI and user interaction
+// Business logic layer - implements rules and calculations
+// Data access layer - handles storage and retrieval
+// Dependencies flow inward
+      </after>
+    </example>
+  </pattern>
+
+  <pattern name="dependency_injection">
+    <description>Inject dependencies instead of creating them</description>
+    <when_to_use>Components need external services</when_to_use>
+    <example>
+      <before>
+// Hard dependency
+// Monitor creates its own Storage instance
+      </before>
+      <after>
+// Dependency injection
+// Monitor receives Storage through constructor
+// Enables testing with mock implementations
+// Improves flexibility
+      </after>
+    </example>
+  </pattern>
+</common_patterns>

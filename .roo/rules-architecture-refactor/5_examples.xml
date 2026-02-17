@@ -1,0 +1,211 @@
+<complete_examples>
+  <example name="analyze_architecture">
+    <scenario>
+      Analyze the cliff-watch architecture for principle violations
+    </scenario>
+
+    <user_request>
+      Analyze the cliff-watch architecture and identify DRY, SOLID, LEAN, and KISS violations
+    </user_request>
+
+    <workflow>
+      <step number="1">
+        <description>Review module structure</description>
+        <approach>
+          Review the crates/ directory structure and module organization.
+          Outcome: understand current architectural organization.
+        </approach>
+        <expected_outcome>Understanding of current module boundaries</expected_outcome>
+      </step>
+
+      <step number="2">
+        <description>Identify DRY violations</description>
+        <approach>
+          Search for duplicated patterns across modules.
+          Outcome: list of architectural duplication.
+        </approach>
+        <analysis>Look for repeated communication patterns, validation logic, etc.</analysis>
+      </step>
+
+      <step number="3">
+        <description>Identify SOLID violations</description>
+        <approach>
+          Review modules for Single Responsibility violations.
+          Outcome: list of modules with multiple responsibilities.
+        </approach>
+        <analysis>Check for tight coupling and dependency issues</analysis>
+      </step>
+
+      <step number="4">
+        <description>Identify LEAN waste</description>
+        <approach>
+          Look for unnecessary layers, abstractions, or complexity.
+          Outcome: list of architectural waste.
+        </approach>
+        <analysis>Identify patterns that add no value</analysis>
+      </step>
+
+      <step number="5">
+        <description>Document findings</description>
+        <approach>
+          Create comprehensive analysis document.
+          Outcome: documented architecture review with recommendations.
+        </approach>
+      </step>
+    </workflow>
+
+    <completion>
+      Architecture analysis complete with documented findings:
+      - DRY violations: [list]
+      - SOLID violations: [list]
+      - LEAN waste: [list]
+      - Recommendations: [list]
+    </completion>
+
+    <key_takeaways>
+      <takeaway>Document all architectural findings with clear rationale</takeaway>
+      <takeaway>Focus on actionable recommendations</takeaway>
+      <takeaway>Consider impact and effort for each recommendation</takeaway>
+    </key_takeaways>
+  </example>
+
+  <example name="propose_module_refactoring">
+    <scenario>
+      Propose refactoring to improve module boundaries
+    </scenario>
+
+    <user_request>
+      Propose a refactoring plan to improve module boundaries in cliff-watch-core
+    </user_request>
+
+    <workflow>
+      <step number="1">
+        <description>Analyze current module boundaries</description>
+        <approach>
+          Review cliff-watch-core module structure and dependencies.
+          Outcome: understanding of current boundaries and coupling.
+        </approach>
+        <expected_outcome>Map of current module dependencies</expected_outcome>
+      </step>
+
+      <step number="2">
+        <description>Identify boundary issues</description>
+        <approach>
+          Look for modules with multiple responsibilities or high coupling.
+          Outcome: list of boundary issues.
+        </approach>
+        <analysis>Identify modules that violate Single Responsibility</analysis>
+      </step>
+
+      <step number="3">
+        <description>Design new boundaries</description>
+        <approach>
+          Propose new module boundaries with clear responsibilities.
+          Outcome: proposed architecture with improved boundaries.
+        </approach>
+        <analysis>Ensure new boundaries follow SOLID principles</analysis>
+      </step>
+
+      <step number="4">
+        <description>Document refactoring plan</description>
+        <approach>
+          Create detailed refactoring plan with steps and rationale.
+          Outcome: actionable refactoring plan.
+        </approach>
+      </step>
+
+      <step number="5">
+        <description>Create ADR</description>
+        <approach>
+          Create Architecture Decision Record for the proposed changes.
+          Outcome: documented decision with context and consequences.
+        </approach>
+      </step>
+    </workflow>
+
+    <completion>
+      Module refactoring plan proposed:
+      - Current issues: [list]
+      - Proposed boundaries: [diagram]
+      - Refactoring steps: [list]
+      - ADR created: [file]
+    </completion>
+
+    <key_takeaways>
+      <takeaway>Create ADRs for significant architectural decisions</takeaway>
+      <takeaway>Propose incremental changes that can be validated</takeaway>
+      <takeaway>Document the rationale for each proposed change</takeaway>
+    </key_takeaways>
+  </example>
+
+  <example name="design_new_component">
+    <scenario>
+      Design a new component following principles
+    </scenario>
+
+    <user_request>
+      Design a new metrics collection component for the cliff-watch architecture
+    </user_request>
+
+    <workflow>
+      <step number="1">
+        <description>Understand requirements</description>
+        <approach>
+          Review requirements and existing architecture.
+          Outcome: understanding of where new component fits.
+        </approach>
+        <expected_outcome>Clear requirements and integration points</expected_outcome>
+      </step>
+
+      <step number="2">
+        <description>Design component interface</description>
+        <approach>
+          Define clear interface and responsibilities.
+          Outcome: component interface with single responsibility.
+        </approach>
+        <analysis>Ensure interface follows SOLID principles</analysis>
+      </step>
+
+      <step number="3">
+        <description>Design integration</description>
+        <approach>
+          Define how component integrates with existing architecture.
+          Outcome: integration design with clear boundaries.
+        </approach>
+        <analysis>Ensure minimal coupling to existing components</analysis>
+      </step>
+
+      <step number="4">
+        <document>
+          <description>Document component design</description>
+          <approach>
+            Create comprehensive design document.
+            Outcome: documented component design.
+          </approach>
+        </document>
+      </step>
+
+      <step number="5">
+        <description>Create ADR</description>
+        <approach>
+          Create Architecture Decision Record for the new component.
+          Outcome: documented decision with context and consequences.
+        </approach>
+      </step>
+    </workflow>
+
+    <completion>
+      New component design complete:
+      - Interface: [specification]
+      - Integration: [design]
+      - Documentation: [file]
+      - ADR: [file]
+    </completion>
+
+    <key_takeaways>
+      <takeaway>Design components with clear, single responsibilities</takeaway>
+      <takeaway>Minimize coupling to existing architecture</takeaway>
+      <takeaway>Document all design decisions with ADRs</takeaway>
+    </key_takeaways>
+  </example>
+</complete_examples>

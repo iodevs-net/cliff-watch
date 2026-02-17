@@ -17,7 +17,7 @@ fn main() {
     println!("Generando trayectoria ORGÁNICA (Humana)...");
     
     let mut t_human = 0.0;
-    for i in 0..200 {
+    for _i in 0..200 {
         // Los humanos no tienen un polling rate perfecto de cristal de cuarzo
         let dt = 0.01 + (rand::random::<f64>() - 0.5) * 0.002;
         t_human += dt;

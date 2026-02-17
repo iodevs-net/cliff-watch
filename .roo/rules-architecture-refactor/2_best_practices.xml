@@ -1,0 +1,123 @@
+<best_practices>
+  <general_principles>
+    <principle priority="high">
+      <name>DRY - Don't Repeat Yourself (Architectural Level)</name>
+      <description>Eliminate architectural duplication through shared patterns and components</description>
+      <rationale>Duplicated architecture increases maintenance burden and inconsistency</rationale>
+      <example>
+        <scenario>Multiple modules implementing similar communication patterns</scenario>
+        <good>Create shared communication protocol/interface</good>
+        <bad>Implement similar patterns independently in each module</bad>
+      </example>
+    </principle>
+
+    <principle priority="high">
+      <name>SOLID - Single Responsibility (Architectural Level)</name>
+      <description>Each module/component should have one reason to change</description>
+      <rationale>Improves maintainability and reduces coupling</rationale>
+      <example>
+        <scenario>A module that handles UI, business logic, and persistence</scenario>
+        <good>Split into separate UI, business logic, and persistence modules</good>
+        <bad>Keep all concerns in one monolithic module</bad>
+      </example>
+    </principle>
+
+    <principle priority="high">
+      <name>SOLID - Dependency Inversion (Architectural Level)</name>
+      <description>Depend on abstractions, not concretions</description>
+      <rationale>Enables flexibility and testability</rationale>
+      <example>
+        <scenario>Business logic directly depends on database implementation</scenario>
+        <good>Business logic depends on repository interface</good>
+        <bad>Business logic directly calls database functions</bad>
+      </example>
+    </principle>
+
+    <principle priority="medium">
+      <name>LEAN - Eliminate Architectural Waste</name>
+      <description>Remove unnecessary layers, abstractions, and complexity</description>
+      <rationale>Waste increases cognitive load and development time</rationale>
+      <example>
+        <scenario>Unused modules and over-engineered abstractions</scenario>
+        <good>Remove unused modules and simplify abstractions</good>
+        <bad>Keep "future-proof" architecture that adds no value</bad>
+      </example>
+    </principle>
+
+    <principle priority="high">
+      <name>KISS - Keep It Simple, Stupid (Architectural Level)</name>
+      <description>Prefer simple architectures over complex ones</description>
+      <rationale>Complexity is the enemy of maintainability</rationale>
+      <example>
+        <scenario>Microservices for a simple application</scenario>
+        <good>Use modular monolith for simple applications</good>
+        <bad>Over-engineer with microservices when not needed</bad>
+      </example>
+    </principle>
+  </general_principles>
+
+  <architectural_practices>
+    <practice category="module_boundaries">
+      <rule>Design clear module boundaries</rule>
+      <guidelines>
+        <guideline>Each module should have a single, well-defined purpose</guideline>
+        <guideline>Minimize coupling between modules</guideline>
+        <guideline>Maximize cohesion within modules</guideline>
+        <guideline>Define clear interfaces between modules</guideline>
+      </guidelines>
+    </practice>
+
+    <practice category="layering">
+      <rule>Apply appropriate layering</rule>
+      <guidelines>
+        <guideline>Separate presentation, business logic, and data access</guideline>
+        <guideline>Dependencies should flow inward (higher layers depend on lower layers)</guideline>
+        <guideline>Avoid circular dependencies</guideline>
+        <guideline>Use dependency injection for loose coupling</guideline>
+      </guidelines>
+    </practice>
+
+    <practice category="patterns">
+      <rule>Apply architectural patterns appropriately</rule>
+      <guidelines>
+        <guideline>Use patterns that solve actual problems, not for their own sake</guideline>
+        <guideline>Prevent pattern proliferation (choose patterns wisely)</guideline>
+        <guideline>Document why each pattern was chosen</guideline>
+        <guideline>Be willing to remove patterns that no longer serve their purpose</guideline>
+      </guidelines>
+    </practice>
+
+    <practice category="documentation">
+      <rule>Document architectural decisions</rule>
+      <guidelines>
+        <guideline>Create Architecture Decision Records (ADRs)</guideline>
+        <guideline>Document the context, decision, and consequences</guideline>
+        <guideline>Keep documentation up-to-date</guideline>
+        <guideline>Include diagrams for complex architectures</guideline>
+      </guidelines>
+    </practice>
+  </architectural_practices>
+
+  <quality_checklist>
+    <category name="before_refactoring">
+      <item>Understand current architecture</item>
+      <item>Identify architectural violations</item>
+      <item>Review existing documentation</item>
+      <item>Analyze dependencies and coupling</item>
+    </category>
+
+    <category name="during_refactoring">
+      <item>Apply principles incrementally</item>
+      <item>Document all architectural decisions</item>
+      <item>Consider impact on existing code</item>
+      <item>Validate against requirements</item>
+    </category>
+
+    <category name="after_refactoring">
+      <item>Update all documentation</item>
+      <item>Verify principles are better followed</item>
+      <item>Review for new violations</item>
+      <item>Update roadmap with remaining tasks</item>
+    </category>
+  </quality_checklist>
+</best_practices>

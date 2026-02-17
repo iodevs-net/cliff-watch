@@ -1,0 +1,120 @@
+<decision_guidance>
+  <principles>
+    <principle>Do not include runtime implementation details (no function names, command names, UI entry points, or execution syntax)</principle>
+    <principle>Prefer the smallest change that satisfies the request</principle>
+    <principle>Prefer a single source of truth; avoid duplicated rules across files</principle>
+    <principle>Ask a clarifying question only when critical ambiguity remains</principle>
+  </principles>
+
+  <refactoring_decisions>
+    <decision name="when_to_extract">
+      <question>Should I extract this code into a separate function?</question>
+      <criteria>
+        <criterion>Code appears 3+ times with minor variations</criterion>
+        <criterion>Function exceeds 20-30 lines</criterion>
+        <criterion>Code has a single, clear responsibility</criterion>
+        <criterion>Extraction improves testability</criterion>
+      </criteria>
+      <when_not_to_extract>
+        <reason>Code only appears once and is simple</reason>
+        <reason>Extraction would reduce readability</reason>
+        <reason>Code is tightly coupled to surrounding context</reason>
+      </when_not_to_extract>
+    </decision>
+
+    <decision name="when_to_use_trait">
+      <question>Should I use a trait for this abstraction?</question>
+      <criteria>
+        <criterion>Multiple types need the same behavior</criterion>
+        <criterion>Behavior needs to be polymorphic</criterion>
+        <criterion>Open/Closed principle applies (extensibility needed)</criterion>
+        <criterion>Test doubles are needed</criterion>
+      </criteria>
+      <when_not_to_use_trait>
+        <reason>Only one implementation exists</reason>
+        <reason>Simple enum or match suffices</reason>
+        <reason>Over-engineering for current needs</reason>
+      </when_not_to_use_trait>
+    </decision>
+
+    <decision name="when_to_clone">
+      <question>Should I clone this value or use references?</question>
+      <criteria>
+        <criterion>Ownership is needed for storage</criterion>
+        <criterion>Value is small (Copy types: primitives, small structs)</criterion>
+        <criterion>Lifetime management would be complex</criterion>
+      </criteria>
+      <when_not_to_clone>
+        <reason>Reference suffices for read-only access</reason>
+        <reason>Value is expensive to clone (Vec, String, large structs)</reason>
+        <reason>Borrowing is straightforward</reason>
+      </when_not_to_clone>
+    </decision>
+
+    <decision name="when_to_use_error_type">
+      <question>What error handling approach should I use?</question>
+      <criteria>
+        <criterion>Use Option for optional values (no error context needed)</criterion>
+        <criterion>Use Result for recoverable errors with context</criterion>
+        <criterion>Use panic! for unrecoverable errors (bugs, invariants)</criterion>
+        <criterion>Use thiserror/anyhow for error propagation in libraries/apps</criterion>
+      </criteria>
+    </decision>
+
+    <decision name="when_to_add_abstraction">
+      <question>Is this abstraction necessary (LEAN principle)?</question>
+      <criteria>
+        <criterion>Abstraction eliminates real duplication</criterion>
+        <criterion>Abstraction improves testability</criterion>
+        <criterion>Abstraction enables future extensibility</criterion>
+      </criteria>
+      <when_not_to_add>
+        <reason>YAGNI - You Aren't Gonna Need It</reason>
+        <reason>Abstraction adds more complexity than it removes</reason>
+        <reason>Simple code would be more maintainable</reason>
+      </when_not_to_add>
+    </decision>
+  </refactoring_decisions>
+
+  <boundaries>
+    <rule>Only edit Rust source files (.rs) and Cargo.toml</rule>
+    <rule>Never modify system files or require system-level installation</rule>
+    <rule>All changes are workspace-scoped only</rule>
+    <rule>Hand off to Architecture Refactor mode for architectural decisions</rule>
+    <rule>Hand off to Debug mode for runtime issues</rule>
+  </boundaries>
+
+  <validation>
+    <rule>After refactoring, ensure cargo clippy passes without warnings</rule>
+    <rule>After refactoring, ensure cargo fmt is applied</rule>
+    <rule>After refactoring, ensure all tests pass</rule>
+    <rule>After refactoring, verify no new DRY violations were introduced</rule>
+    <rule>After refactoring, confirm SOLID principles are better followed</rule>
+  </validation>
+
+  <common_anti_patterns>
+    <anti_pattern name="premature_abstraction">
+      <description>Adding abstractions before they're needed</description>
+      <why_problematic>Increases complexity without benefit</why_problematic>
+      <correct_approach>Wait until duplication or complexity justifies abstraction</correct_approach>
+    </anti_pattern>
+
+    <anti_pattern name="over_use_unwrap">
+      <description>Using unwrap() instead of proper error handling</description>
+      <why_problematic>Causes panics in production</why_problematic>
+      <correct_approach>Use ? operator, expect() with messages, or handle errors explicitly</correct_approach>
+    </anti_pattern>
+
+    <anti_pattern name="string_everywhere">
+      <description>Using String when &str or enums would be better</description>
+      <why_problematic>Loses type safety, increases allocations</why_problematic>
+      <correct_approach>Use &str for borrowed strings, enums for fixed sets of values</correct_approach>
+    </anti_pattern>
+
+    <anti_pattern name="god_struct">
+      <description>Structs with too many responsibilities</description>
+      <why_problematic>Violates Single Responsibility Principle</why_problematic>
+      <correct_approach>Split into smaller, focused structs</correct_approach>
+    </anti_pattern>
+  </common_anti_patterns>
+</decision_guidance>

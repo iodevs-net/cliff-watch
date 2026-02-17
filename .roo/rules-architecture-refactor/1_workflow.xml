@@ -1,0 +1,79 @@
+<workflow_instructions>
+  <mode_overview>
+    Architecture Refactor mode ensures software architecture follows DRY, SOLID, LEAN, and KISS principles.
+    Focuses on analyzing architecture, proposing improvements, and documenting architectural decisions.
+  </mode_overview>
+
+  <initialization_steps>
+    <step number="1">
+      <action>Understand the user's request</action>
+      <details>
+        Identify whether the user wants to:
+        - Analyze existing architecture
+        - Propose architectural improvements
+        - Design new components/modules
+        - Review module boundaries
+        - Document architectural decisions
+      </details>
+    </step>
+
+    <step number="2">
+      <action>Gather necessary context</action>
+      <details>
+        Review the minimal set of repository materials:
+        - Existing architecture documentation
+        - Module structure and dependencies
+        - Current design patterns in use
+        - Roadmaps and requirements documents
+      </details>
+    </step>
+  </initialization_steps>
+
+  <main_workflow>
+    <phase name="analysis">
+      <description>Analyze current architecture</description>
+      <steps>
+        <step>Review module structure and boundaries</step>
+        <step>Identify architectural violations (DRY, SOLID, LEAN, KISS)</step>
+        <step>Analyze dependency graph</step>
+        <step>Identify coupling and cohesion issues</step>
+        <step>Document findings</step>
+      </steps>
+    </phase>
+
+    <phase name="design">
+      <description>Propose architectural improvements</description>
+      <steps>
+        <step>Design new module boundaries</step>
+        <step>Apply SOLID principles at architectural level</step>
+        <step>Remove architectural waste (LEAN)</step>
+        <step>Simplify architecture (KISS)</step>
+        <step>Document proposed changes</step>
+      </steps>
+    </phase>
+
+    <phase name="documentation">
+      <description>Create architectural documentation</description>
+      <steps>
+        <step>Document current architecture</step>
+        <step>Document proposed improvements</step>
+        <step>Create ADR (Architecture Decision Records)</step>
+        <step>Update roadmap with architectural tasks</step>
+      </steps>
+    </phase>
+  </main_workflow>
+
+  <completion_criteria>
+    <criterion>Architecture follows DRY, SOLID, LEAN, KISS principles</criterion>
+    <criterion>Module boundaries are clear and well-defined</criterion>
+    <criterion>Documentation is comprehensive and up-to-date</criterion>
+    <criterion>Proposed improvements are actionable</criterion>
+  </completion_criteria>
+
+  <boundaries>
+    <rule>Only edit documentation files (.md) and mode configuration</rule>
+    <rule>Never modify system files or require system-level installation</rule>
+    <rule>All changes are workspace-scoped only</rule>
+    <rule>Hand off to Rust/TypeScript Code Quality modes for code-level refactoring</rule>
+  </boundaries>
+</workflow_instructions>

@@ -1,0 +1,122 @@
+<best_practices>
+  <general_principles>
+    <principle priority="high">
+      <name>DRY - Don't Repeat Yourself</name>
+      <description>Eliminate code duplication through abstraction and reuse</description>
+      <rationale>Duplicated code increases maintenance burden and bug risk</rationale>
+      <example>
+        <scenario>Multiple functions with similar logic</scenario>
+        <good>Extract common logic into a helper function or trait</good>
+        <bad>Copy-paste code with minor variations</bad>
+      </example>
+    </principle>
+
+    <principle priority="high">
+      <name>SOLID - Single Responsibility</name>
+      <description>Each module/function should have one reason to change</description>
+      <rationale>Improves maintainability and testability</rationale>
+      <example>
+        <scenario>A function that validates, processes, and saves data</scenario>
+        <good>Split into separate validation, processing, and persistence functions</good>
+        <bad>Keep all logic in one monolithic function</bad>
+      </example>
+    </principle>
+
+    <principle priority="high">
+      <name>SOLID - Open/Closed</name>
+      <description>Open for extension, closed for modification</description>
+      <rationale>Allows adding features without breaking existing code</rationale>
+      <example>
+        <scenario>Adding new algorithm variants</scenario>
+        <good>Use traits and generics for extensibility</good>
+        <bad>Modify existing enum with new variants everywhere</bad>
+      </example>
+    </principle>
+
+    <principle priority="medium">
+      <name>LEAN - Eliminate Waste</name>
+      <description>Remove unnecessary code, abstractions, and complexity</description>
+      <rationale>Waste increases cognitive load and maintenance cost</rationale>
+      <example>
+        <scenario>Unused functions and dead code</scenario>
+        <good>Remove unused code immediately</good>
+        <bad>Keep "just in case" code</bad>
+      </example>
+    </principle>
+
+    <principle priority="high">
+      <name>KISS - Keep It Simple, Stupid</name>
+      <description>Prefer simple solutions over complex ones</description>
+      <rationale>Complexity is the enemy of maintainability</rationale>
+      <example>
+        <scenario>A simple counter vs. a complex state machine</scenario>
+        <good>Use simple counter when it meets requirements</good>
+        <bad>Over-engineer with unnecessary abstractions</bad>
+      </example>
+    </principle>
+  </general_principles>
+
+  <rust_specific_practices>
+    <practice category="ownership">
+      <rule>Use ownership and borrowing correctly</rule>
+      <guidelines>
+        <guideline>Borrow when you don't need ownership</guideline>
+        <guideline>Clone only when necessary</guideline>
+        <guideline>Use references for function parameters when possible</guideline>
+      </guidelines>
+    </practice>
+
+    <practice category="error_handling">
+      <rule>Handle errors explicitly and appropriately</rule>
+      <guidelines>
+        <guideline>Use Result for recoverable errors</guideline>
+        <guideline>Use Option for optional values</guideline>
+        <guideline>Avoid unwrap() in production code</guideline>
+        <guideline>Propagate errors with ? operator</guideline>
+      </guidelines>
+    </practice>
+
+    <practice category="types">
+      <rule>Leverage Rust's type system</rule>
+      <guidelines>
+        <guideline>Use enums for state representation</guideline>
+        <guideline>Create newtypes for type safety</guideline>
+        <guideline>Use traits for shared behavior</guideline>
+        <guideline>Avoid String when &str suffices</guideline>
+      </guidelines>
+    </practice>
+
+    <practice category="idioms">
+      <rule>Follow Rust idioms and conventions</rule>
+      <guidelines>
+        <guideline>Use iterators instead of imperative loops</guideline>
+        <guideline>Leverage derive macros for common traits</guideline>
+        <guideline>Use builder pattern for complex construction</guideline>
+        <guideline>Prefer composition over inheritance</guideline>
+      </guidelines>
+    </practice>
+  </rust_specific_practices>
+
+  <quality_checklist>
+    <category name="before_refactoring">
+      <item>Understand the existing code's purpose</item>
+      <item>Identify all principle violations</item>
+      <item>Check test coverage</item>
+      <item>Review dependencies and imports</item>
+    </category>
+
+    <category name="during_refactoring">
+      <item>Apply principles incrementally</item>
+      <item>Keep tests passing after each change</item>
+      <item>Document non-obvious decisions</item>
+      <item>Review for new violations introduced</item>
+    </category>
+
+    <category name="after_refactoring">
+      <item>Run cargo clippy</item>
+      <item>Run cargo fmt</item>
+      <item>Verify all tests pass</item>
+      <item>Check for compilation warnings</item>
+    </category>
+  </quality_checklist>
+</best_practices>

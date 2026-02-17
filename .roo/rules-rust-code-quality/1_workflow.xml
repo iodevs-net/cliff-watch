@@ -1,0 +1,78 @@
+<workflow_instructions>
+  <mode_overview>
+    Rust Code Quality mode ensures code follows DRY, SOLID, LEAN, and KISS principles.
+    Focuses on refactoring existing code, writing clean Rust modules, and reviewing code quality.
+  </mode_overview>
+
+  <initialization_steps>
+    <step number="1">
+      <action>Understand the user's request</action>
+      <details>
+        Identify whether the user wants to:
+        - Refactor existing code
+        - Write new Rust code
+        - Review code for quality issues
+        - Apply specific principles (DRY, SOLID, LEAN, KISS)
+      </details>
+    </step>
+
+    <step number="2">
+      <action>Gather necessary context</action>
+      <details>
+        Review the minimal set of repository materials:
+        - Target Rust files to refactor or extend
+        - Related modules and dependencies
+        - Existing patterns in the codebase
+        - Cargo.toml for dependency context
+      </details>
+    </step>
+  </initialization_steps>
+
+  <main_workflow>
+    <phase name="analysis">
+      <description>Analyze current code for principle violations</description>
+      <steps>
+        <step>Identify DRY violations (duplicate code)</step>
+        <step>Check SOLID principle adherence</step>
+        <step>Look for LEAN waste (unnecessary complexity)</step>
+        <step>Assess KISS compliance (over-engineering)</step>
+        <step>Plan refactoring approach</step>
+      </steps>
+    </phase>
+
+    <phase name="implementation">
+      <description>Apply quality improvements</description>
+      <steps>
+        <step>Refactor to eliminate duplication</step>
+        <step>Apply SOLID principles where applicable</step>
+        <step>Simplify complex logic (KISS)</step>
+        <step>Remove unnecessary abstractions (LEAN)</step>
+        <step>Ensure type safety without over-engineering</step>
+      </steps>
+    </phase>
+
+    <phase name="validation">
+      <description>Verify improvements</description>
+      <steps>
+        <step>Check code compiles without warnings</step>
+        <step>Verify tests still pass</step>
+        <step>Confirm principles are now followed</step>
+        <step>Ensure no regressions introduced</step>
+      </steps>
+    </phase>
+  </main_workflow>
+
+  <completion_criteria>
+    <criterion>Code follows DRY, SOLID, LEAN, KISS principles</criterion>
+    <criterion>No compilation warnings</criterion>
+    <criterion>All tests pass</criterion>
+    <criterion>Code is more maintainable</criterion>
+  </completion_criteria>
+
+  <boundaries>
+    <rule>Only edit Rust source files and Cargo.toml</rule>
+    <rule>Never modify system files or require system-level changes</rule>
+    <rule>All changes are workspace-scoped only</rule>
+    <rule>Hand off to Architecture Refactor mode for architectural decisions</rule>
+  </boundaries>
+</workflow_instructions>

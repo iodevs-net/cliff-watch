@@ -1,0 +1,134 @@
+<decision_guidance>
+  <principles>
+    <principle>Do not include runtime implementation details (no function names, command names, UI entry points, or execution syntax)</principle>
+    <principle>Prefer the smallest change that satisfies the request</principle>
+    <principle>Prefer a single source of truth; avoid duplicated rules across files</principle>
+    <principle>Ask a clarifying question only when critical ambiguity remains</principle>
+  </principles>
+
+  <architectural_decisions>
+    <decision name="when_to_split_module">
+      <question>Should I split this module?</question>
+      <criteria>
+        <criterion>Module has multiple responsibilities</criterion>
+        <criterion>Module exceeds reasonable size</criterion>
+        <criterion>Module has high internal coupling</criterion>
+        <criterion>Splitting would improve testability</criterion>
+      </criteria>
+      <when_not_to_split>
+        <reason>Module has a single, clear responsibility</reason>
+        <reason>Module is already cohesive and focused</reason>
+        <reason>Splitting would increase complexity without benefit</reason>
+      </when_not_to_split>
+    </decision>
+
+    <decision name="when_to_add_layer">
+      <question>Should I add a new architectural layer?</question>
+      <criteria>
+        <criterion>Current architecture mixes concerns</criterion>
+        <criterion>Layer would separate distinct responsibilities</criterion>
+        <criterion>Layer would improve testability</criterion>
+        <criterion>Layer would enable future flexibility</criterion>
+      </criteria>
+      <when_not_to_add_layer>
+        <reason>Current separation is already appropriate</reason>
+        <reason>Layer would add unnecessary complexity</reason>
+        <reason>YAGNI - You Aren't Gonna Need It</reason>
+      </when_not_to_add_layer>
+    </decision>
+
+    <decision name="when_to_use_pattern">
+      <question>Should I use this architectural pattern?</question>
+      <criteria>
+        <criterion>Pattern solves a real problem</criterion>
+        <criterion>Pattern is appropriate for the scale</criterion>
+        <criterion>Team understands the pattern</criterion>
+        <criterion>Benefits outweigh complexity</criterion>
+      </criteria>
+      <when_not_to_use_pattern>
+        <reason>Pattern doesn't solve a real problem</reason>
+        <reason>Pattern is overkill for current scale</reason>
+        <reason>Team doesn't understand the pattern</reason>
+        <reason>Complexity outweighs benefits</reason>
+      </when_not_to_use_pattern>
+    </decision>
+
+    <decision name="when_to_create_interface">
+      <question>Should I create an interface for this?</question>
+      <criteria>
+        <criterion>Multiple implementations exist or will exist</criterion>
+        <criterion>Test doubles are needed</criterion>
+        <criterion>Decoupling would improve flexibility</criterion>
+        <criterion>Interface would define a clear contract</criterion>
+      </criteria>
+      <when_not_to_create_interface>
+        <reason>Only one implementation exists</reason>
+        <reason>Concrete type is sufficient</reason>
+        <reason>Interface would add no value</reason>
+      </when_not_to_create_interface>
+    </decision>
+
+    <decision name="when_to_refactor_architecture">
+      <question>Is architectural refactoring necessary?</question>
+      <criteria>
+        <criterion>Current architecture causes real problems</criterion>
+        <criterion>Benefits are clear and measurable</criterion>
+        <criterion>Cost of refactoring is justified</criterion>
+        <criterion>Refactoring aligns with business goals</criterion>
+      </criteria>
+      <when_not_to_refactor>
+        <reason>Current architecture works well</reason>
+        <reason>Benefits are speculative</reason>
+        <reason>Cost outweighs benefits</reason>
+      </when_not_to_refactor>
+    </decision>
+  </architectural_decisions>
+
+  <boundaries>
+    <rule>Only edit documentation files (.md) and mode configuration</rule>
+    <rule>Never modify system files or require system-level installation</rule>
+    <rule>All changes are workspace-scoped only</rule>
+    <rule>Hand off to Rust/TypeScript Code Quality modes for code-level refactoring</rule>
+    <rule>Hand off to Code mode for implementing architectural changes</rule>
+  </boundaries>
+
+  <validation>
+    <rule>After proposing changes, verify principles are better followed</rule>
+    <rule>After proposing changes, ensure documentation is comprehensive</rule>
+    <rule>After proposing changes, confirm changes are actionable</rule>
+    <rule>After proposing changes, verify no new violations introduced</rule>
+    <rule>After proposing changes, update roadmap with tasks</rule>
+  </validation>
+
+  <common_anti_patterns>
+    <anti_pattern name="premature_abstraction">
+      <description>Adding architectural abstractions before they're needed</description>
+      <why_problematic>Increases complexity without benefit</why_problematic>
+      <correct_approach>Wait until duplication or complexity justifies abstraction</correct_approach>
+    </anti_pattern>
+
+    <anti_pattern name="pattern_proliferation">
+      <description>Using many patterns without clear purpose</description>
+      <why_problematic>Increases cognitive load and maintenance cost</why_problematic>
+      <correct_approach>Choose patterns that solve real problems, document their purpose</correct_approach>
+    </anti_pattern>
+
+    <anti_pattern name="over_layering">
+      <description>Adding unnecessary layers to the architecture</description>
+      <why_problematic>Increases complexity without adding value</why_problematic>
+      <correct_approach>Use the minimum number of layers needed for separation of concerns</correct_approach>
+    </anti_pattern>
+
+    <anti_pattern name="god_module">
+      <description>Modules with too many responsibilities</description>
+      <why_problematic>Violates Single Responsibility Principle</why_problematic>
+      <correct_approach>Split into smaller, focused modules with clear boundaries</correct_approach>
+    </anti_pattern>
+
+    <anti_pattern name="circular_dependencies">
+      <description>Modules depending on each other in a cycle</description>
+      <why_problematic>Makes code difficult to understand, test, and maintain</why_problematic>
+      <correct_approach>Extract shared concerns into separate module, use dependency inversion</correct_approach>
+    </anti_pattern>
+  </common_anti_patterns>
+</decision_guidance>

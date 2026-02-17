@@ -132,7 +132,7 @@ impl MouseSentinel {
             y,
             t: std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
+                .expect("System time is before UNIX_EPOCH")
                 .as_secs_f64(),
         };
         self.push(event);
@@ -169,13 +169,19 @@ impl MouseSentinel {
         let a = accelerations(&v)?;
         let j = jerks(&a)?;
 
-        let t_start = match self.buffer.front().unwrap() {
-            InputEvent::Mouse { t, .. } => *t,
-            _ => return Err(MouseSentinelError::InsufficientData),
+        let t_start = match self.buffer.front() {
+            Some(event) => match event {
+                InputEvent::Mouse { t, .. } => *t,
+                _ => return Err(MouseSentinelError::InsufficientData),
+            },
+            None => return Err(MouseSentinelError::InsufficientData),
         };
-        let t_end = match self.buffer.back().unwrap() {
-            InputEvent::Mouse { t, .. } => *t,
-            _ => return Err(MouseSentinelError::InsufficientData),
+        let t_end = match self.buffer.back() {
+            Some(event) => match event {
+                InputEvent::Mouse { t, .. } => *t,
+                _ => return Err(MouseSentinelError::InsufficientData),
+            },
+            None => return Err(MouseSentinelError::InsufficientData),
         };
 
         let duration = t_end - t_start;

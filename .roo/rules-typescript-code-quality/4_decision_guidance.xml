@@ -1,0 +1,125 @@
+<decision_guidance>
+  <principles>
+    <principle>Do not include runtime implementation details (no function names, command names, UI entry points, or execution syntax)</principle>
+    <principle>Prefer the smallest change that satisfies the request</principle>
+    <principle>Prefer a single source of truth; avoid duplicated rules across files</principle>
+    <principle>Ask a clarifying question only when critical ambiguity remains</principle>
+  </principles>
+
+  <refactoring_decisions>
+    <decision name="when_to_extract">
+      <question>Should I extract this code into a separate function?</question>
+      <criteria>
+        <criterion>Code appears 3+ times with minor variations</criterion>
+        <criterion>Function exceeds 20-30 lines</criterion>
+        <criterion>Code has a single, clear responsibility</criterion>
+        <criterion>Extraction improves testability</criterion>
+      </criteria>
+      <when_not_to_extract>
+        <reason>Code only appears once and is simple</reason>
+        <reason>Extraction would reduce readability</reason>
+        <reason>Code is tightly coupled to surrounding context</reason>
+      </when_not_to_extract>
+    </decision>
+
+    <decision name="when_to_use_interface">
+      <question>Should I use an interface for this abstraction?</question>
+      <criteria>
+        <criterion>Multiple types need the same behavior</criterion>
+        <criterion>Behavior needs to be polymorphic</criterion>
+        <criterion>Open/Closed principle applies (extensibility needed)</criterion>
+        <criterion>Test doubles are needed</criterion>
+      </criteria>
+      <when_not_to_use_interface>
+        <reason>Only one implementation exists</reason>
+        <reason>Simple type or object suffices</reason>
+        <reason>Over-engineering for current needs</reason>
+      </when_not_to_use_interface>
+    </decision>
+
+    <decision name="when_to_use_type_vs_interface">
+      <question>Should I use 'type' or 'interface'?</question>
+      <criteria>
+        <criterion>Use interface for object shapes that can be extended</criterion>
+        <criterion>Use type for unions, intersections, and primitive aliases</criterion>
+        <criterion>Use type for mapped types and conditional types</criterion>
+      </criteria>
+    </decision>
+
+    <decision name="when_to_use_any">
+      <question>Can I use 'any' type here?</question>
+      <criteria>
+        <criterion>Never use 'any' - use 'unknown' for truly dynamic data</criterion>
+        <criterion>Use specific types when the shape is known</criterion>
+        <criterion>Use generics for reusable components</criterion>
+      </criteria>
+      <when_not_to_use_any>
+        <reason>Type safety is lost with 'any'</reason>
+        <reason>'unknown' provides better type checking</reason>
+        <reason>Specific types catch more errors at compile time</reason>
+      </when_not_to_use_any>
+    </decision>
+
+    <decision name="when_to_add_abstraction">
+      <question>Is this abstraction necessary (LEAN principle)?</question>
+      <criteria>
+        <criterion>Abstraction eliminates real duplication</criterion>
+        <criterion>Abstraction improves testability</criterion>
+        <criterion>Abstraction enables future extensibility</criterion>
+      </criteria>
+      <when_not_to_add>
+        <reason>YAGNI - You Aren't Gonna Need It</reason>
+        <reason>Abstraction adds more complexity than it removes</reason>
+        <reason>Simple code would be more maintainable</reason>
+      </when_not_to_add>
+    </decision>
+  </refactoring_decisions>
+
+  <boundaries>
+    <rule>Only edit TypeScript files in clients/cliff-watch-witness/</rule>
+    <rule>Never modify system files or require system-level installation</rule>
+    <rule>All changes are workspace-scoped only</rule>
+    <rule>Hand off to Architecture Refactor mode for architectural decisions</rule>
+    <rule>Hand off to Debug mode for runtime issues</rule>
+  </boundaries>
+
+  <validation>
+    <rule>After refactoring, ensure TypeScript compiler passes without errors</rule>
+    <rule>After refactoring, ensure linter passes without warnings</rule>
+    <rule>After refactoring, ensure all tests pass</rule>
+    <rule>After refactoring, verify no new DRY violations were introduced</rule>
+    <rule>After refactoring, confirm SOLID principles are better followed</rule>
+  </validation>
+
+  <common_anti_patterns>
+    <anti_pattern name="premature_abstraction">
+      <description>Adding abstractions before they're needed</description>
+      <why_problematic>Increases complexity without benefit</why_problematic>
+      <correct_approach>Wait until duplication or complexity justifies abstraction</correct_approach>
+    </anti_pattern>
+
+    <anti_pattern name="over_use_any">
+      <description>Using 'any' type instead of proper types</description>
+      <why_problematic>Loses all type safety benefits</why_problematic>
+      <correct_approach>Use 'unknown' for dynamic data, specific types otherwise</correct_approach>
+    </anti_pattern>
+
+    <anti_pattern name="optional_chaining_abuse">
+      <description>Overusing optional chaining to hide type errors</description>
+      <why_problematic>Masks real type issues</why_problematic>
+      <correct_approach>Fix the type definition instead of working around it</correct_approach>
+    </anti_pattern>
+
+    <anti_pattern name="god_class">
+      <description>Classes with too many responsibilities</description>
+      <why_problematic>Violates Single Responsibility Principle</why_problematic>
+      <correct_approach>Split into smaller, focused classes</correct_approach>
+    </anti_pattern>
+
+    <anti_pattern name="async_waterfall">
+      <description>Nested async/await chains</description>
+      <why_problematic>Hard to read and error-prone</why_problematic>
+      <correct_approach>Use Promise.all for parallel operations, extract functions for sequential</correct_approach>
+    </anti_pattern>
+  </common_anti_patterns>
+</decision_guidance>

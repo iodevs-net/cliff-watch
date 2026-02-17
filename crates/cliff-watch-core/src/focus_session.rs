@@ -211,8 +211,7 @@ impl FocusTracker {
 
     /// Obtiene las métricas actuales (FILTRADAS por productividad)
     pub fn get_metrics(&self) -> FocusMetrics {
-        let mut metrics = FocusMetrics::default();
-        metrics.unique_files = self.productive_files.len();
+        let mut metrics = FocusMetrics { unique_files: self.productive_files.len(), ..Default::default() };
 
         // Calcular foco acumulado SOLO en archivos productivos
         for (path, mins) in &self.file_focus_accum {

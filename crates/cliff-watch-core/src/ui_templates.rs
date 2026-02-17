@@ -1,6 +1,5 @@
 /// Cliff-Watch UI Templates
 /// v3.5 - Aura Premium (High-Fidelity AI Forge)
-
 pub const BOLD: &str = "\\033[1m";
 pub const ITALIC: &str = "\\033[3m";
 pub const CYAN: &str = "\\033[38;5;51m";    // Cyan vibrante

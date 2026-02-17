@@ -48,13 +48,7 @@ impl IpcServer {
         audit_mode: bool,
     ) -> Self {
         let verifying_key = signing_key.verifying_key();
-        
-        let pubkey_bytes = verifying_key.as_bytes();
-        let mut pubkey_hex = String::with_capacity(pubkey_bytes.len() * 2);
-        for byte in pubkey_bytes {
-            pubkey_hex.push_str(&format!("{:02x}", byte));
-        }
-        
+        let pubkey_hex = cliff_watch_core::crypto::bytes_to_hex(verifying_key.as_bytes());
         info!("Daemon started with Public Key: {}", pubkey_hex);
 
         Self {

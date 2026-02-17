@@ -1,0 +1,185 @@
+<complete_examples>
+  <example name="refactor_dry_violation">
+    <scenario>
+      Refactor duplicated validation logic in the monitor module
+    </scenario>
+
+    <user_request>
+      Refactor the monitor module to eliminate DRY violations in validation logic
+    </user_request>
+
+    <workflow>
+      <step number="1">
+        <description>Identify DRY violations</description>
+        <approach>
+          Review the monitor module for repeated validation patterns.
+          Outcome: identify duplicate validation checks across multiple functions.
+        </approach>
+        <expected_outcome>List of duplicated validation patterns</expected_outcome>
+      </step>
+
+      <step number="2">
+        <description>Extract common validation logic</description>
+        <approach>
+          Create a validation trait or helper functions to eliminate duplication.
+          Outcome: extracted validation functions that can be reused.
+        </approach>
+        <analysis>Ensure the extracted functions have clear, single responsibilities</analysis>
+      </step>
+
+      <step number="3">
+        <description>Refactor to use extracted logic</description>
+        <approach>
+          Replace duplicated code with calls to the extracted validation functions.
+          Outcome: cleaner, DRY-compliant code.
+        </approach>
+      </step>
+
+      <step number="4">
+        <description>Validate the refactoring</description>
+        <approach>
+          Run cargo clippy, cargo fmt, and tests to ensure no regressions.
+          Outcome: code compiles without warnings and all tests pass.
+        </approach>
+      </step>
+    </workflow>
+
+    <completion>
+      The monitor module now has centralized validation logic, eliminating DRY violations.
+      All validation checks use the extracted functions, improving maintainability.
+    </completion>
+
+    <key_takeaways>
+      <takeaway>Extract common logic into reusable functions to eliminate duplication</takeaway>
+      <takeaway>Ensure extracted functions have single, clear responsibilities</takeaway>
+      <takeaway>Always run clippy and tests after refactoring</takeaway>
+    </key_takeaways>
+  </example>
+
+  <example name="apply_solid_principles">
+    <scenario>
+      Apply SOLID principles to the crypto module
+    </scenario>
+
+    <user_request>
+      Refactor the crypto module to better follow SOLID principles
+    </user_request>
+
+    <workflow>
+      <step number="1">
+        <description>Analyze current structure</description>
+        <approach>
+          Review the crypto module for SOLID violations.
+          Outcome: identify modules/functions with multiple responsibilities.
+        </approach>
+        <expected_outcome>List of SOLID principle violations</expected_outcome>
+      </step>
+
+      <step number="2">
+        <description>Apply Single Responsibility Principle</description>
+        <approach>
+          Split modules/functions that have multiple responsibilities.
+          Outcome: each module/function has one reason to change.
+        </approach>
+        <analysis>Ensure separation improves testability and maintainability</analysis>
+      </step>
+
+      <step number="3">
+        <description>Apply Open/Closed Principle</description>
+        <approach>
+          Use traits to make the module extensible without modification.
+          Outcome: new algorithms can be added without changing existing code.
+        </approach>
+      </step>
+
+      <step number="4">
+        <description>Apply Interface Segregation</description>
+        <approach>
+          Split large traits into smaller, focused interfaces.
+          Outcome: clients only depend on methods they use.
+        </approach>
+      </step>
+
+      <step number="5">
+        <description>Validate the refactoring</description>
+        <approach>
+          Run cargo clippy, cargo fmt, and tests to ensure no regressions.
+          Outcome: code compiles without warnings and all tests pass.
+        </approach>
+      </step>
+    </workflow>
+
+    <completion>
+      The crypto module now follows SOLID principles:
+      - Each module has a single responsibility
+      - The module is open for extension, closed for modification
+      - Traits are focused and segregated
+      - Dependencies are properly inverted
+    </completion>
+
+    <key_takeaways>
+      <takeaway>Apply SOLID principles incrementally, validating after each change</takeaway>
+      <takeaway>Use traits for extensibility (Open/Closed)</takeaway>
+      <takeaway>Split large traits into smaller, focused interfaces</takeaway>
+    </key_takeaways>
+  </example>
+
+  <example name="simplify_over_engineered_code">
+    <scenario>
+      Simplify over-engineered code following KISS principle
+    </scenario>
+
+    <user_request>
+      Simplify the entropy calculation module - it's too complex
+    </user_request>
+
+    <workflow>
+      <step number="1">
+        <description>Analyze complexity</description>
+        <approach>
+          Review the entropy module for unnecessary abstractions and complexity.
+          Outcome: identify areas where simpler solutions exist.
+        </approach>
+        <expected_outcome>List of over-engineered components</expected_outcome>
+      </step>
+
+      <step number="2">
+        <description>Remove unnecessary abstractions</description>
+        <approach>
+          Eliminate traits, structs, or functions that don't add value.
+          Outcome: simpler, more direct implementation.
+        </approach>
+        <analysis>Ensure simplification doesn't lose necessary flexibility</analysis>
+      </step>
+
+      <step number="3">
+        <description>Simplify complex logic</description>
+        <approach>
+          Break down complex functions into smaller, clearer ones.
+          Outcome: more readable and maintainable code.
+        </approach>
+      </step>
+
+      <step number="4">
+        <description>Validate the simplification</description>
+        <approach>
+          Run cargo clippy, cargo fmt, and tests to ensure no regressions.
+          Outcome: code compiles without warnings and all tests pass.
+        </approach>
+      </step>
+    </workflow>
+
+    <completion>
+      The entropy module is now simpler and more maintainable:
+      - Unnecessary abstractions removed
+      - Complex logic broken down
+      - Code is easier to understand and modify
+    </completion>
+
+    <key_takeaways>
+      <takeaway>Prefer simple solutions over complex ones (KISS)</takeaway>
+      <takeaway>Remove abstractions that don't add value (LEAN)</takeaway>
+      <takeaway>Break down complex logic into smaller, clearer functions</takeaway>
+    </key_takeaways>
+  </example>
+</complete_examples>

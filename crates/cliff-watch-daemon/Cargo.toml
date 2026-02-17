@@ -6,7 +6,7 @@ authors = ["Cliff-Watch Project"]
 description = "Cliff-Watch daemon for continuous monitoring and validation"
 
 [dependencies]
-cliff-watch-core = { path = "../cliff-watch-core" }
+cliff-watch-core = { path = "../cliff-watch-core", features = ["zkp"] }
 tokio = { workspace = true }
 tokio-util = { version = "0.7", features = ["codec"] }
 futures = "0.3"
@@ -26,6 +26,9 @@ lto = true
 panic = "abort"
 strip = true
 codegen-units = 1
+
+[dev-dependencies]
+tempfile = "3.8"
 
 [features]
 default = []

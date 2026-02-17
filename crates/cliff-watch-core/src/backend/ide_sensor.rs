@@ -38,11 +38,6 @@ impl IdeSensorBackend {
         }
     }
 
-    /// Crea un backend con la ruta por defecto
-    pub fn default() -> Self {
-        Self::new(DEFAULT_SENSOR_SOCKET)
-    }
-
     /// Obtiene la ruta del socket
     pub fn socket_path(&self) -> &PathBuf {
         &self.socket_path
@@ -104,6 +99,12 @@ impl IdeSensorBackend {
         // Cleanup socket on shutdown
         let _ = std::fs::remove_file(&self.socket_path);
         Ok(())
+    }
+}
+
+impl Default for IdeSensorBackend {
+    fn default() -> Self {
+        Self::new(DEFAULT_SENSOR_SOCKET)
     }
 }
 

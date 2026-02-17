@@ -1,8 +1,6 @@
 //! Este módulo implementa funciones estadísticas de alta eficiencia (LEAN) para validar
 //! contribuciones humanas vs AI, siguiendo el modelo de Ruido Cognitivo (CNS) v3.0.
 
-use statrs::statistics::Statistics;
-
 /// Calcula la burstiness de una serie de tiempos de edición
 /// Burstiness mide la variabilidad en los intervalos entre eventos
 pub fn calculate_burstiness(times: &[f64]) -> f64 {

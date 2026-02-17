@@ -1,10 +1,14 @@
 use clap::{Parser, Subcommand};
-use cliff_watch_core::{sentinel_self_check, git::{open_repository}, crypto::generate_keypair};
+use cliff_watch_core::{sentinel_self_check, git::open_repository};
 use std::process::{self, Command, Stdio};
 use std::path::Path;
 use indicatif::{ProgressBar, ProgressStyle, MultiProgress};
 use console::{style, Emoji};
 use std::time::Duration;
+
+// Import command modules
+mod commands;
+use commands::{handle_config, handle_daemon, handle_off, handle_on, handle_init, handle_metrics, handle_report, handle_verify};
 
 #[derive(Parser, Debug)]
 #[command(
@@ -94,7 +98,7 @@ enum Commands {
     /// Gestión de configuración
     Config {
         #[command(subcommand)]
-        action: ConfigAction,
+        action: commands::config::ConfigAction,
     },
     /// Genera reporte de auditoría
     Report {
@@ -113,14 +117,6 @@ enum Commands {
     },
 }
 
-#[derive(Subcommand, Debug)]
-enum ConfigAction {
-    /// Crea un archivo de configuración por defecto
-    Init,
-    /// Valida la configuración actual
-    Check,
-}
-
 #[tokio::main]
 async fn main() {
     let cli = Cli::parse();
@@ -130,58 +126,7 @@ async fn main() {
             run_setup(yes).await;
         }
         Commands::Report { limit, format } => {
-            let repo = match open_repository(Path::new(".")) {
-                Ok(repo) => repo,
-                Err(e) => {
-                    eprintln!("❌ Error opening repository: {}", e);
-                    process::exit(1);
-                }
-            };
-            
-            match cliff_watch_core::git::get_governance_history(&repo, limit) {
-                Ok(entries) => {
-                    if format == "json" {
-                        println!("{}", serde_json::to_string_pretty(&entries).unwrap());
-                        return;
-                    }
-                    
-                    let total_commits = entries.len();
-                    let total_score: f64 = entries.iter().map(|e| e.score).sum();
-                    let avg_score = if total_commits > 0 { total_score / total_commits as f64 } else { 0.0 };
-                    
-                    let mut authors = std::collections::HashMap::new();
-                    for e in &entries {
-                        *authors.entry(e.author.clone()).or_insert(0.0) += e.score;
-                    }
-                    
-                    if format == "md" {
-                         println!("# Governance Audit Report");
-                         println!("- **Analyzed Commits:** {}", total_commits);
-                         println!("- **Total Energy:** {:.2}", total_score);
-                         println!("- **Average Entropy:** {:.2}", avg_score);
-                         println!("\n## Top Contributors (by Energy)");
-                         println!("| Author | Energy |");
-                         println!("|--------|--------|");
-                         for (author, score) in &authors {
-                             println!("| {} | {:.2} |", author, score);
-                         }
-                    } else {
-                        println!("📊 Governance Report (Last {} commits)", limit);
-                        println!("--------------------------------");
-                        println!("  Commits Analyzed: {}", total_commits);
-                        println!("  Total Energy:     {:.2}", total_score);
-                        println!("  Average Score:    {:.2}", avg_score);
-                        println!("\n🏆 Top Contributors:");
-                        for (author, score) in authors {
-                            println!("  - {}: {:.2}", author, score);
-                        }
-                    }
-                }
-                Err(e) => {
-                     eprintln!("❌ Failed to generate report: {}", e);
-                     process::exit(1);
-                }
-            }
+            handle_report(limit, format);
         }
         Commands::SystemCheck { verbose } => {
             match sentinel_self_check() {
@@ -200,40 +145,7 @@ async fn main() {
             }
         }
         Commands::Init { path } => {
-            let repo_path = Path::new(&path);
-            match open_repository(repo_path) {
-                Ok(_repo) => {
-                    println!("Initializing cliff-watch in: {}", path);
-                    
-                    // Generate keypair for the repository
-                    let (_signing_key, verifying_key) = generate_keypair();
-                    let pubkey_bytes = verifying_key.as_bytes();
-                    let mut pubkey_hex = String::with_capacity(pubkey_bytes.len() * 2);
-                    for byte in pubkey_bytes {
-                        pubkey_hex.push_str(&format!("{:02x}", byte));
-                    }
-                    
-                    println!("Generated new keypair for repository");
-                    println!("Public key: {}", pubkey_hex);
-                    
-                    // Add cliff-watch configuration to git config
-                    // This would typically include the public key and other settings
-                    
-                    // Install hooks
-                    let config = cliff_watch_core::config::GovConfig::load().unwrap_or_default();
-                    match cliff_watch_core::git::install_hooks(&_repo, &config) {
-                        Ok(_) => println!("✅ Git hooks installed successfully (Audit Mode: {})", config.governance.audit_mode),
-                        Err(e) => eprintln!("⚠️ Failed to install git hooks: {}", e),
-                    }
-                    
-                    println!("✅ Repository initialized successfully");
-                    println!("Public key stored: {}", pubkey_hex);
-                }
-                Err(error) => {
-                    eprintln!("❌ Failed to initialize repository: {}", error);
-                    process::exit(1);
-                }
-            }
+            handle_init(path);
         }
         Commands::Disable { path } => {
             let repo_path = Path::new(&path);
@@ -251,137 +163,19 @@ async fn main() {
             }
         }
         Commands::Daemon { config, daemon } => {
-            if daemon {
-                println!("Starting cliff-watch daemon in background with config: {}", config);
-            } else {
-                println!("Starting cliff-watch daemon with config: {}", config);
-            }
-            // Implementation would start the daemon process
-            println!("✅ Daemon started successfully");
+            handle_daemon(config, daemon);
         }
         Commands::Status => {
-            match query_daemon(cliff_watch_core::protocol::Request::GetStatus).await {
-                Ok(cliff_watch_core::protocol::Response::Status { is_running, uptime_secs, events_captured }) => {
-                    println!("Daemon Status:");
-                    println!("  Running: {}", if is_running { "✅ Yes" } else { "❌ No" });
-                    println!("  Uptime:  {}s", uptime_secs);
-                    println!("  Events:  {}", events_captured);
-                }
-                Ok(cliff_watch_core::protocol::Response::Error(e)) => {
-                    eprintln!("❌ Daemon error: {}", e);
-                }
-                Ok(_) => {
-                    eprintln!("❌ Unexpected response from daemon");
-                }
-                Err(e) => {
-                    eprintln!("❌ Could not connect to daemon: {}. Is it running?", e);
-                }
-            }
+            commands::handle_status().await;
         }
         Commands::On => {
-            use std::process::{Command, Stdio};
-            println!("🚀 Encendiendo el centinela termodinámico...");
-            
-            match Command::new("cliff-watch-daemon")
-                .stdin(Stdio::null())
-                .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .spawn() {
-                    Ok(_) => {
-                        println!("✅ Centinela activado en background.");
-                        println!("Usa 'cliff-watch status' para verificar.");
-                    },
-                    Err(_) => {
-                        // Reintento con path local (target/debug) o global estándar
-                        let local_path = Path::new("target/debug/cliff-watch-daemon");
-                        let bin_path = if local_path.exists() {
-                            "target/debug/cliff-watch-daemon"
-                        } else {
-                            "/usr/local/bin/cliff-watch-daemon"
-                        };
-
-                        match Command::new(bin_path)
-                            .stdin(Stdio::null())
-                            .stdout(Stdio::null())
-                            .stderr(Stdio::null())
-                            .spawn() {
-                                Ok(_) => {
-                                    println!("✅ Centinela activado en background ({}).", bin_path);
-                                    println!("Usa 'cliff-watch status' para verificar.");
-                                },
-                                Err(e) => {
-                                    eprintln!("❌ Error al encender el centinela: {}. ¿Está instalado?", e);
-                                    process::exit(1);
-                                }
-                            }
-                    }
-                }
+            handle_on();
         }
         Commands::Off => {
-            use std::process::Command;
-            println!("🛑 Apagando el centinela...");
-            
-            match Command::new("pkill")
-                .arg("-x") // Match exact name
-                .arg("cliff-watch-daemon")
-                .status() {
-                    Ok(status) if status.success() => println!("✅ Centinela desactivado."),
-                    Ok(_) => println!("⚠️ El centinela no parecía estar corriendo."),
-                    Err(e) => eprintln!("❌ Error al apagar el centinela: {}", e),
-                }
+            handle_off();
         }
         Commands::Metrics { short } => {
-            match query_daemon(cliff_watch_core::protocol::Request::GetMetrics).await {
-                Ok(cliff_watch_core::protocol::Response::Metrics { 
-                    ldlj, entropy, throughput, human_score, coupling, battery_level,
-                    focus_time_mins, edit_bursts, is_focused, zkp_proof, score_history
-                }) => {
-                    if short {
-                        println!("{:.4}", human_score);
-                    } else {
-                        // Generate Sparkline
-                        let bars = " ▂▃▄▅▆▇█";
-                        let history_viz: String = score_history.iter().map(|&v| {
-                            let idx = ((v.max(0.0).min(1.0) * 8.0) as usize).min(7);
-                            let bar = bars.chars().nth(idx).unwrap_or(' ');
-                            // Colorize: <0.4 Red, <0.7 Yellow, >=0.7 Green
-                            if v < 0.4 {
-                                format!("{}", style(bar).red())
-                            } else if v < 0.7 {
-                                format!("{}", style(bar).yellow())
-                            } else {
-                                format!("{}", style(bar).green())
-                            }
-                        }).collect();
-
-                        println!("GovMonitor - Estado Termodinámico v2.1:");
-                        println!("  🔋 Energía (Kinética+Foco): {:.1}%", battery_level);
-                        println!("  🧠 Acoplamiento Cognitivo:  {:.1}%", coupling * 100.0);
-                        println!("  --------------------------------");
-                        println!("  ⏱️  Tiempo de Foco:         {:.2} min", focus_time_mins);
-                        println!("  ✍️  Ráfagas de Edición:     {}", edit_bursts);
-                        println!("  👁️  Sensor IDE:             {}", if is_focused { "✅ ACTIVO" } else { "💤 INACTIVO" });
-                        println!("  --------------------------------");
-                        println!("  📊 Timeline de Humanidad (3 min):");
-                        println!("     [{}]", history_viz);
-                        println!("  --------------------------------");
-                        println!("  🛡️  Human Probability:     {:.2}%", human_score * 100.0);
-                        println!("  🔐  ZKP Proof:             {}", if zkp_proof.is_some() { style("VERIFIED").green() } else { style("PENDING").yellow() });
-                    }
-                }
-                Ok(cliff_watch_core::protocol::Response::Error(e)) => {
-                    if !short { eprintln!("❌ Daemon error: {}", e); }
-                    process::exit(1);
-                }
-                Ok(_) => {
-                    if !short { eprintln!("❌ Unexpected response from daemon"); }
-                    process::exit(1);
-                }
-                Err(e) => {
-                    if !short { eprintln!("❌ Could not connect to daemon: {}. Is it running?", e); }
-                    process::exit(1);
-                }
-            }
+            handle_metrics(short).await;
         }
         Commands::RegisterKey { key, alias } => {
             let repo = match open_repository(Path::new(".")) {
@@ -401,122 +195,7 @@ async fn main() {
             }
         }
         Commands::Verify { commit, format } => {
-            use cliff_watch_core::git::{get_trusted_keys};
-            use cliff_watch_core::crypto::{verify_signature, VerifyingKey};
-
-            #[derive(serde::Serialize)]
-            struct VerificationReport {
-                status: String,
-                commit: String,
-                signer: Option<String>,
-                score: Option<f64>,
-                reason: Option<String>,
-            }
-
-            let repo = match open_repository(Path::new(".")) {
-                Ok(repo) => repo,
-                Err(e) => {
-                    let report = VerificationReport {
-                        status: "error".to_string(),
-                        commit: commit.clone(),
-                        signer: None,
-                        score: None,
-                        reason: Some(format!("Error opening repository: {}", e)),
-                    };
-                    if format == "json" {
-                        println!("{}", serde_json::to_string(&report).unwrap());
-                    } else {
-                        eprintln!("❌ Error opening repository: {}", e);
-                    }
-                    process::exit(1);
-                }
-            };
-
-            let commit_obj = match repo.revparse_single(&commit) {
-                Ok(obj) => obj.peel_to_commit().unwrap(),
-                Err(e) => {
-                    let report = VerificationReport {
-                        status: "error".to_string(),
-                        commit: commit.clone(),
-                        signer: None,
-                        score: None,
-                        reason: Some(format!("Commit not found: {}", e)),
-                    };
-                    if format == "json" {
-                        println!("{}", serde_json::to_string(&report).unwrap());
-                    } else {
-                        eprintln!("❌ Commit not found: {}", e);
-                    }
-                    process::exit(1);
-                }
-            };
-
-            let message = commit_obj.message().unwrap_or("");
-            let trusted_keys = get_trusted_keys(&repo).unwrap_or_default();
-
-            // Buscar trailer de cliff-watch
-            let mut found = false;
-            for line in message.lines() {
-                if line.starts_with("cliff-watch-score:") {
-                    let score_part = line.replace("cliff-watch-score:", "").trim().to_string();
-                    // El formato esperado es "score=0.85:sig=<hex>"
-                    let parts: Vec<&str> = score_part.split(":sig=").collect();
-                    if parts.len() == 2 {
-                        let score_str = parts[0].replace("score=", "");
-                        let sig_hex = parts[1];
-                        let sig_bytes = hex::decode(sig_hex).unwrap_or_default();
-                        
-                        let mut verified = false;
-                        let mut signer_alias = "Unknown";
-
-                        for (alias, key_hex) in &trusted_keys {
-                            let key_bytes = hex::decode(key_hex).unwrap_or_default();
-                            if let Ok(verifying_key) = VerifyingKey::from_bytes(&key_bytes.try_into().unwrap_or([0;32])) {
-                                if verify_signature(&verifying_key, parts[0].as_bytes(), &sig_bytes).unwrap_or(false) {
-                                    verified = true;
-                                    signer_alias = alias;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if verified {
-                            let score_val = score_str.parse::<f64>().ok();
-                            if format == "json" {
-                                let report = VerificationReport {
-                                    status: "verified".to_string(),
-                                    commit: commit.clone(),
-                                    signer: Some(signer_alias.to_string()),
-                                    score: score_val,
-                                    reason: None,
-                                };
-                                println!("{}", serde_json::to_string(&report).unwrap());
-                            } else {
-                                println!("✅ Commit VERIFICADO Criptográficamente");
-                                println!("   Firmante: {}", signer_alias);
-                                println!("   Score:    {}", score_str);
-                            }
-                            found = true;
-                        }
-                    }
-                }
-            }
-
-            if !found {
-                if format == "json" {
-                     let report = VerificationReport {
-                        status: "failed".to_string(),
-                        commit: commit.clone(),
-                        signer: None,
-                        score: None,
-                        reason: Some("no_valid_signature".to_string()),
-                    };
-                    println!("{}", serde_json::to_string(&report).unwrap());
-                } else {
-                    eprintln!("❌ FALLO DE VERIFICACIÓN: No se encontró firma válida de Cliff-Watch.");
-                }
-                process::exit(1);
-            }
+            handle_verify(commit, format);
         }
         Commands::VerifyWork => {
             use cliff_watch_core::git::get_staged_diff;
@@ -543,17 +222,17 @@ async fn main() {
             }
 
             let cost = estimate_entropic_cost(&diff, None);
-            
+
             match query_daemon(cliff_watch_core::protocol::Request::GetTicket { cost }).await {
                 Ok(cliff_watch_core::protocol::Response::Ticket { success, message, signature }) => {
                     if success {
                         println!("✅ Thermodynamic check passed: {}", message);
-                        
+
                         // Guardar el ticket firmado para el hook prepare-commit-msg
                         if let Some(sig_bytes) = signature {
                             let sig_hex = hex::encode(sig_bytes);
                             let ticket_data = format!("score={:.2}:sig={}", cost, sig_hex);
-                            
+
                             let gov_dir = repo.path().join("cliff-watch");
                             if !gov_dir.exists() {
                                 let _ = std::fs::create_dir_all(&gov_dir);
@@ -576,7 +255,7 @@ async fn main() {
                             }
                             _ => eprintln!("⚠️ Could not retrieve focus witness data"),
                         }
-                        
+
                         process::exit(0);
                     } else {
                         eprintln!("❌ {}", message);
@@ -613,7 +292,7 @@ async fn main() {
                     if !gov_dir.exists() {
                         let _ = std::fs::create_dir_all(&gov_dir);
                     }
-                    
+
                     let witness_file = gov_dir.join("latest_witness");
                     if let Err(e) = std::fs::write(&witness_file, &data) {
                         eprintln!("⚠️ Error saving witness data: {}", e);
@@ -638,50 +317,7 @@ async fn main() {
             }
         }
         Commands::Config { action } => {
-            match action {
-                ConfigAction::Init => {
-                    let config_content = r#"# Cliff-Watch Configuration
-
-[governance]
-# Dificultad de la "Prueba de Sudor" (Easy, Normal, Hardcore)
-difficulty = "Normal"
-# Entropía mínima para validar un commit (base 2.5)
-min_entropy = 2.5
-
-[monitoring]
-# Ventana de agrupación de eventos (ms)
-debounce_window_ms = 500
-# Directorios a ignorar (además de .git)
-ignore_top_level_dirs = [".git", "target", "node_modules", "dist", "build"]
-# Extensiones de archivo a ignorar
-ignore_extensions = ["log", "lock", "tmp", "bak"]
-"#;
-                    let path = Path::new("cliff-watch.toml");
-                    if path.exists() {
-                        eprintln!("⚠️ cliff-watch.toml already exists!");
-                        process::exit(1);
-                    }
-                    if let Err(e) = std::fs::write(path, config_content) {
-                        eprintln!("❌ Failed to create config file: {}", e);
-                        process::exit(1);
-                    }
-                    println!("✅ Created cliff-watch.toml");
-                }
-                ConfigAction::Check => {
-                    match cliff_watch_core::config::GovConfig::load() {
-                        Ok(cfg) => {
-                            println!("✅ Configuration valid:");
-                            println!("   Difficulty:  {}", cfg.governance.difficulty);
-                            println!("   Min Entropy: {}", cfg.governance.min_entropy);
-                            println!("   Watch Root:  {}", cfg.monitoring.watch_root);
-                        }
-                        Err(e) => {
-                            eprintln!("❌ Configuration invalid: {}", e);
-                            process::exit(1);
-                        }
-                    }
-                }
-            }
+            handle_config(action);
         }
     }
 }
@@ -692,16 +328,17 @@ async fn query_daemon(request: cliff_watch_core::protocol::Request) -> anyhow::R
 
     let socket_path = "/tmp/cliff-watch.sock";
     let mut stream = UnixStream::connect(socket_path).await?;
-    
+
     let request_json = serde_json::to_vec(&request)?;
     stream.write_all(&request_json).await?;
-    
+
     let mut buffer = vec![0; 1024];
     let n = stream.read(&mut buffer).await?;
-    
+
     let response: cliff_watch_core::protocol::Response = serde_json::from_slice(&buffer[..n])?;
     Ok(response)
 }
+
 async fn run_setup(no_confirm: bool) {
     println!("\n{} {} {}", style("===").blue(), style("Orquestador Soberano cliff-watch v2.1").bold(), style("===").blue());
     println!("{}\n", style("Preparando tu PC para la verdadera Gobernanza de Código...").italic());
@@ -713,17 +350,17 @@ async fn run_setup(no_confirm: bool) {
 
     let m = MultiProgress::new();
     let sty = ProgressStyle::with_template("{spinner:.green} [{elapsed_precise}] {bar:40.cyan/blue} {pos:>7}/{len:7} {msg}")
-        .unwrap()
+        .expect("Failed to create progress style template")
         .progress_chars("##-");
 
     // Paso 1: Dependencias de Sistema (APT/Pacman)
     let pb1 = m.add(ProgressBar::new(1));
     pb1.set_style(sty.clone());
     pb1.set_message("Escrutando dependencias del sistema operativo...");
-    
+
     tokio::time::sleep(Duration::from_millis(500)).await;
     pb1.set_message(format!("{} Instalando dependencias base (cmake, ssl, zstd)...", PACKAGE));
-    
+
     let mut cmd = if Path::new("/etc/debian_version").exists() {
         let mut c = Command::new("sudo");
         c.args(&["apt", "install", "-y", "build-essential", "pkg-config", "libssl-dev", "libzstd-dev", "libtss2-dev", "cmake", "curl", "git"]);
@@ -735,7 +372,7 @@ async fn run_setup(no_confirm: bool) {
     };
 
     let status = cmd.stdout(Stdio::null()).stderr(Stdio::null()).status();
-    if status.is_err() || !status.unwrap().success() {
+    if status.is_err() || !status.as_ref().map(|s| s.success()).unwrap_or(false) {
         pb1.abandon_with_message("❌ Error instalando dependencias de sistema.");
     } else {
         pb1.finish_with_message(format!("{} Dependencias de sistema listas.", SUCCESS));
@@ -745,7 +382,7 @@ async fn run_setup(no_confirm: bool) {
     let tools = vec!["cargo-audit", "cargo-expand", "cargo-nextest"];
     let pb2 = m.add(ProgressBar::new(tools.len() as u64));
     pb2.set_style(sty.clone());
-    
+
     for tool in tools {
         pb2.set_message(format!("{} Forjando herramienta: {}...", GEAR, tool));
         let _ = Command::new("cargo")
@@ -770,7 +407,7 @@ async fn run_setup(no_confirm: bool) {
         .stderr(Stdio::null())
         .status();
 
-    if vsix_built.is_ok() && vsix_built.unwrap().success() {
+    if vsix_built.as_ref().map(|s| s.success()).unwrap_or(false) {
         pb3.set_message(format!("{} Instalando Testigo Soberano...", SUCCESS));
         let _ = Command::new("code")
             .args(&["--install-extension", "cliff-watch-witness.vsix", "--force"])

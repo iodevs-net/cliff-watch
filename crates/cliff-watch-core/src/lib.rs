@@ -11,6 +11,7 @@ pub mod stats;
 pub mod complexity;
 pub mod config;
 pub mod ui_templates;
+pub mod privacy;
 
 use sha2::{Digest, Sha256};
 use ed25519_dalek::SigningKey;

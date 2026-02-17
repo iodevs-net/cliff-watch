@@ -8,8 +8,7 @@ use tokio_util::sync::CancellationToken;
 use std::time::Duration;
 use std::path::PathBuf;
 
-use cliff_watch_core::monitor::{GitMonitor, GitMonitorConfig, EditEvent, EditKind};
-use cliff_watch_core::focus_protocol::SensorEvent;
+use cliff_watch_core::monitor::{GitMonitor, GitMonitorConfig};
 use cliff_watch_core::mouse_sentinel::InputEvent;
 
 #[tokio::test]

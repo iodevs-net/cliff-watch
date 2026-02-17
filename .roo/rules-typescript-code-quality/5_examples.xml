@@ -1,0 +1,184 @@
+<complete_examples>
+  <example name="refactor_dry_violation">
+    <scenario>
+      Refactor duplicated transport logic in the witness extension
+    </scenario>
+
+    <user_request>
+      Refactor the transport module to eliminate DRY violations
+    </user_request>
+
+    <workflow>
+      <step number="1">
+        <description>Identify DRY violations</description>
+        <approach>
+          Review the transport module for repeated patterns.
+          Outcome: identify duplicate error handling and connection logic.
+        </approach>
+        <expected_outcome>List of duplicated patterns</expected_outcome>
+      </step>
+
+      <step number="2">
+        <description>Extract common logic</description>
+        <approach>
+          Create utility functions to eliminate duplication.
+          Outcome: extracted functions for error handling and connection management.
+        </approach>
+        <analysis>Ensure the extracted functions have clear, single responsibilities</analysis>
+      </step>
+
+      <step number="3">
+        <description>Refactor to use extracted logic</description>
+        <approach>
+          Replace duplicated code with calls to the extracted functions.
+          Outcome: cleaner, DRY-compliant code.
+        </approach>
+      </step>
+
+      <step number="4">
+        <description>Validate the refactoring</description>
+        <approach>
+          Run TypeScript compiler, linter, and tests to ensure no regressions.
+          Outcome: code compiles without errors and all tests pass.
+        </approach>
+      </step>
+    </workflow>
+
+    <completion>
+      The transport module now has centralized logic, eliminating DRY violations.
+      All common patterns use the extracted functions, improving maintainability.
+    </completion>
+
+    <key_takeaways>
+      <takeaway>Extract common logic into reusable functions to eliminate duplication</takeaway>
+      <takeaway>Ensure extracted functions have single, clear responsibilities</takeaway>
+      <takeaway>Always run TypeScript compiler and tests after refactoring</takeaway>
+    </key_takeaways>
+  </example>
+
+  <example name="apply_solid_principles">
+    <scenario>
+      Apply SOLID principles to the extension module
+    </scenario>
+
+    <user_request>
+      Refactor the extension module to better follow SOLID principles
+    </user_request>
+
+    <workflow>
+      <step number="1">
+        <description>Analyze current structure</description>
+        <approach>
+          Review the extension module for SOLID violations.
+          Outcome: identify modules/functions with multiple responsibilities.
+        </approach>
+        <expected_outcome>List of SOLID principle violations</expected_outcome>
+      </step>
+
+      <step number="2">
+        <description>Apply Single Responsibility Principle</description>
+        <approach>
+          Split modules/functions that have multiple responsibilities.
+          Outcome: each module/function has one reason to change.
+        </approach>
+        <analysis>Ensure separation improves testability and maintainability</analysis>
+      </step>
+
+      <step number="3">
+        <description>Apply Open/Closed Principle</description>
+        <approach>
+          Use interfaces to make the module extensible without modification.
+          Outcome: new protocol handlers can be added without changing existing code.
+        </approach>
+      </step>
+
+      <step number="4">
+        <description>Apply Dependency Inversion</description>
+        <approach>
+          Inject dependencies instead of creating them internally.
+          Outcome: better testability and flexibility.
+        </approach>
+      </step>
+
+      <step number="5">
+        <description>Validate the refactoring</description>
+        <approach>
+          Run TypeScript compiler, linter, and tests to ensure no regressions.
+          Outcome: code compiles without errors and all tests pass.
+        </approach>
+      </step>
+    </workflow>
+
+    <completion>
+      The extension module now follows SOLID principles:
+      - Each module has a single responsibility
+      - The module is open for extension, closed for modification
+      - Dependencies are properly inverted
+    </completion>
+
+    <key_takeaways>
+      <takeaway>Apply SOLID principles incrementally, validating after each change</takeaway>
+      <takeaway>Use interfaces for extensibility (Open/Closed)</takeaway>
+      <takeaway>Inject dependencies for better testability</takeaway>
+    </key_takeaways>
+  </example>
+
+  <example name="improve_type_safety">
+    <scenario>
+      Improve type safety by replacing 'any' with proper types
+    </scenario>
+
+    <user_request>
+      Fix type safety issues in the types module - remove 'any' types
+    </user_request>
+
+    <workflow>
+      <step number="1">
+        <description>Identify type safety issues</description>
+        <approach>
+          Review the types module for 'any' usage.
+          Outcome: list of locations where 'any' is used.
+        </approach>
+        <expected_outcome>List of type safety issues</expected_outcome>
+      </step>
+
+      <step number="2">
+        <description>Define proper types</description>
+        <approach>
+          Create interfaces or types to replace 'any'.
+          Outcome: type-safe definitions for all data structures.
+        </approach>
+        <analysis>Use 'unknown' for truly dynamic data, specific types otherwise</analysis>
+      </step>
+
+      <step number="3">
+        <description>Apply type definitions</description>
+        <approach>
+          Replace 'any' with proper types throughout the module.
+          Outcome: fully type-safe code.
+        </approach>
+      </step>
+
+      <step number="4">
+        <description>Validate type safety</description>
+        <approach>
+          Run TypeScript compiler to catch any remaining issues.
+          Outcome: code compiles with strict type checking enabled.
+        </approach>
+      </step>
+    </workflow>
+
+    <completion>
+      The types module is now fully type-safe:
+      - All 'any' types replaced with proper types
+      - 'unknown' used where dynamic data is truly needed
+      - TypeScript compiler passes with strict mode
+    </completion>
+
+    <key_takeaways>
+      <takeaway>Avoid 'any' - use 'unknown' for dynamic data</takeaway>
+      <takeaway>Define proper types for all data structures</takeaway>
+      <takeaway>Enable strict TypeScript checking for maximum safety</takeaway>
+    </key_takeaways>
+  </example>
+</complete_examples>

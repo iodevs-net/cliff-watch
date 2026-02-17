@@ -6,6 +6,7 @@ use curve25519_dalek::ristretto::CompressedRistretto;
 
 /// Representa una prueba de rango ZKP que demuestra que un Score de Humanidad
 /// está por encima de un umbral sin revelar el score exacto.
+#[derive(Debug)]
 pub struct HumanityProof {
     pub commitment: CompressedRistretto,
     pub proof: RangeProof,

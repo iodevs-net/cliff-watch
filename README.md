@@ -4,7 +4,7 @@
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Version](https://img.shields.io/badge/version-5.2%20(Elite)-blue)
+![Version](https://img.shields.io/badge/version-6.0%20(Non-Intrusive)-blue)
 ![Tests](https://img.shields.io/badge/tests-64%2F64-success)
 
 **Cliff-Watch** is a decentralized governance protocol for Git repositories designed to protect code quality from low-fidelity AI spam. It validates human focus and cognitive effort through thermodynamic metrics, ensuring that every commit reflects genuine understanding rather than mindless copy-pasting.
@@ -12,13 +12,16 @@
 ---
 
 ## 📖 Table of Contents
+
 - [The Mission](#-the-mission)
+- [Architecture](#-architecture)
 - [Core Technologies](#-core-technologies)
-- [How It Works](#-how-it-works)
+- [Features](#-features)
 - [Installation](#-installation)
-- [Usage Workflow](#-usage-workflow)
+- [Quick Start](#-quick-start)
 - [Configuration](#-configuration)
 - [The Mathematical Model](#-the-mathematical-model)
+- [Contributing](#-contributing)
 - [License](#-license)
 
 ---
@@ -31,7 +34,47 @@ As Large Language Models lower the cost of code generation to near zero, open-so
 
 ---
 
-## 🧠 Core Technologies (v5.2 Elite)
+## 🏛️ Architecture
+
+Cliff-Watch v6.0 introduces a **non-intrusive VSCode extension architecture** that prioritizes user privacy while maintaining robust Proof of Human Work (PoHW) validation.
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        User's Machine                                │
+│                                                                       │
+│  ┌─────────────────┐                        ┌─────────────────────┐ │
+│  │   VSCode IDE    │                        │   Git Repository    │ │
+│  │                 │                        │                     │ │
+│  │  ┌───────────┐  │   IPC (Unix Socket)    │  ┌───────────────┐  │ │
+│  │  │ Cliff-Watch│◄─┼────────────────────────┼──│ pre-commit    │  │ │
+│  │  │ Witness   │  │                        │  │ hook          │  │ │
+│  │  │ Extension │  │   Privacy-Filtered     │  └───────┬───────┘  │ │
+│  │  │           │  │   Telemetry            │          │           │ │
+│  │  │ - Focus   │  │                        │          ▼           │ │
+│  │  │ - Edits   │  │   - SHA-256 hashes     │  ┌───────────────┐  │ │
+│  │  │ - Nav     │  │   - Bucketed times     │  │    Daemon     │  │ │
+│  │  │ - Beat    │  │   - Aggregated stats   │  │  (optional)   │  │ │
+│  │  └───────────┘  │   - No raw content     │  └───────────────┘  │ │
+│  └─────────────────┘                        └─────────────────────┘ │
+│                                                                       │
+│  Privacy: No root required • No hardware capture • Local processing  │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Key Architectural Changes (v6.0)
+
+| Component | Old (v5.x) | New (v6.0) |
+|-----------|------------|------------|
+| **IDE Integration** | Daemon-based | VSCode Extension |
+| **Hardware Capture** | evdev (requires root) | None |
+| **File Paths** | Full paths | SHA-256 hashed |
+| **Timestamps** | Millisecond precision | 5-second buckets |
+| **Processing** | Server-side | Client-side |
+| **Privacy** | Medium | High (zero-knowledge) |
+
+---
+
+## 🧠 Core Technologies (v6.0 Non-Intrusive)
 
 ### 1. 📉 Real NCD (Normalized Compression Distance)
 We killed the magic numbers. Cliff-Watch uses **Zstandard** to measure the actual entropy density of your edits.
@@ -49,35 +92,80 @@ Every commit has an **Entropic Cost**.
 - You "spend" battery by committing complex code.
 - **Outcome**: You cannot commit a massive 500-line refactor in 2 seconds. The laws of thermodynamics forbid it.
 
-### 4. �️ Sovereign Privacy
+### 4. 🛡️ Sovereign Privacy (v6.0)
 - **Local-First**: All telemetry is processed locally on your machine.
 - **Zero-Knowledge**: The system generates proofs of effort without exposing the actual content of your keystrokes.
+- **Privacy Filtering**: SHA-256 hashing, timestamp bucketing, no raw content storage.
 
 ---
 
-## ⚙️ How It Works
+## ✨ Features
 
-1.  **The Daemon (`cliff-watch-daemon`)**: Runs in the background (user-space). It monitors file events (`notify`), keyboard activity (generic input), and IDE focus states. It maintains the "Battery" state.
-2.  **The Hook (`pre-commit`)**: When you run `git commit`, this hook queries the daemon.
-    - "Do I have enough energy for this diff?"
-    - "Is this code original or a paste?"
-3.  **The CLI (`cliff-watch`)**: Manage the daemon, view metrics, and configure thresholds.
+### Core Features
+- ✅ **Focus Tracking**: Monitors VSCode window focus events
+- ✅ **Edit Analysis**: Detects human typing patterns vs. paste operations
+- ✅ **Navigation Tracking**: Tracks file navigation and code inspection
+- ✅ **Thermodynamic Battery**: Energy-based commit validation
+- ✅ **Human Score Calculation**: EMA-based reputation system
+
+### Privacy Features (v6.0)
+- ✅ **Privacy Filtering**: SHA-256 hashed file paths
+- ✅ **Timestamp Bucketing**: 5-second precision (configurable)
+- ✅ **No Hardware Capture**: Removed evdev dependency
+- ✅ **Local Processing**: All metrics computed client-side
+- ✅ **Zero-Knowledge Design**: No sensitive data transmitted
+
+### User Experience
+- ✅ **VSCode Extension**: Easy installation via VSIX
+- ✅ **Configuration UI**: Visual settings in VSCode
+- ✅ **Audit Mode**: Warn-only mode for teams
+- ✅ **Multiple Difficulty Levels**: Easy, Normal, Hardcore
 
 ---
 
 ## 🚀 Installation
 
 ### Prerequisites
-- Linux (Systemd support recommended for daemon persistence)
-- Rust toolchain (`cargo`)
+- Linux (recommended) or macOS
+- VSCode (^1.108.1+)
+- Rust toolchain (optional, for CLI building)
 
-### Build from Source
+### Option 1: VSCode Extension (Recommended)
+
+1. **Download the Extension**
+   
+   Get the latest `cliff-watch-witness-v*.vsix` from [Releases](https://github.com/iodevs-net/cliff-watch/releases)
+
+2. **Install in VSCode**
+   
+   - Press `Ctrl+Shift+X` (or `Cmd+Shift+X` on macOS)
+   - Click the `...` menu in the top-right corner
+   - Select "Install from VSIX..."
+   - Navigate to the downloaded `.vsix` file
+
+3. **Enable the Extension**
+   
+   - Open VSCode Settings (`Ctrl+,`)
+   - Search for "Cliff-Watch"
+   - Enable `Cliff-Watch: Enabled`
+
+### Option 2: Build from Source
+
 ```bash
 # Clone the repository
 git clone https://github.com/iodevs-net/cliff-watch.git
 cd cliff-watch
 
-# Build Release Binary
+# Build the VSCode extension
+cd clients/cliff-watch-witness
+npm install
+npm run compile
+
+# Package as VSIX (requires vsce)
+npx vsce package
+
+# Or build the Rust CLI
+cd ../..
 cargo build --release --features "ast-analysis"
 
 # Install System-wide (Optional)
@@ -85,39 +173,70 @@ sudo cp target/release/cliff-watch /usr/local/bin/
 ```
 
 ### Quick Setup
+
 Initialize Cliff-Watch in any Git repository:
 
 ```bash
+# Using the CLI (if installed)
 cd /path/to/your/repo
-cliff-watch init  # Installs hooks and config
-cliff-watch on    # Starts the daemon
+cliff-watch init
 ```
 
 ---
 
-## 💻 Usage Workflow
+## ⚡ Quick Start
 
-### 1. The "Flow"
-Just code normally. The daemon quietly observes your focus sessions.
-- **High Focus**: Coding, navigating files, small edits. -> **Battery Charges 🔋**
-- **Distraction**: Switching windows, idle time. -> **Battery Drains 🪫**
+### Step 1: Install the VSCode Extension
 
-### 2. The Commit
-```bash
-git commit -m "feat: amazing new feature"
+Follow the [Installation](#installation) instructions above.
+
+### Step 2: Configure (Optional)
+
+Open VSCode Settings and configure:
+
+```json
+{
+  "cliff-watch.enabled": true,
+  "cliff-watch.difficulty": "Normal",
+  "cliff-watch.auditMode": true
+}
 ```
-The hook runs automatically:
-- **✅ Success**: Ticket signed. Commit proceeds.
-- **⚠️ Audit Warning**: (If `audit_mode = true`) Commit proceeds, but logs a warning about low focus/humanity.
-- **❌ Blocked**: (If `audit_mode = false`) Commit rejected. "Thermodynamic Failure". Go back and review your code.
 
-### 3. View Metrics
-Check your current stats at any time:
+Or edit `cliff-watch.toml` in your project root:
+
+```toml
+[governance]
+difficulty = "Normal"  # Easy, Normal, Hardcore
+min_entropy = 2.5      # Minimum entropy (bits/byte)
+audit_mode = true      # Warn only, don't block
+
+[monitoring]
+debounce_window_ms = 500
+ignore_extensions = ["log", "lock", "tmp"]
+```
+
+### Step 3: Start Coding
+
+1. Open VSCode and start coding normally
+2. The extension automatically tracks your activity
+3. When you're ready to commit:
+
+```bash
+git commit -m "Your commit message"
+```
+
+The commit hook will verify your "Humanity Score" based on the telemetry collected by the extension.
+
+### Step 4: View Metrics
+
+Check your current metrics:
+
 ```bash
 cliff-watch metrics
 ```
-Output:
-```text
+
+Example output:
+```
 GovMonitor - Estado Termodinámico v2.1:
   🔋 Energía (Kinética+Foco): 85.0%
   🧠 Acoplamiento Cognitivo:  0.92
@@ -144,6 +263,15 @@ debounce_window_ms = 500
 ignore_extensions = ["log", "lock", "tmp"]
 ```
 
+### VSCode Settings
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `cliff-watch.enabled` | boolean | true | Enable/disable monitoring |
+| `cliff-watch.difficulty` | string | "Normal" | Easy, Normal, Hardcore |
+| `cliff-watch.auditMode` | boolean | true | Warn instead of block |
+| `cliff-watch.minEntropy` | number | 2.5 | Minimum entropy threshold |
+
 ---
 
 ## 📐 The Mathematical Model
@@ -152,6 +280,7 @@ Cliff-Watch relies on the **Cognitive-Kinematic Coupling** theory.
 
 ### 1. Human Score Calculation
 $$ H = 0.4 \cdot B + 0.4 \cdot N + 0.2 \cdot F $$
+
 Where:
 - $B$ is **Burstiness** (Pareto distribution of edit intervals).
 - $N$ is **NCD** (Normalized Compression Distance vs. Repo Context).
@@ -169,15 +298,16 @@ This ensures that 1000 lines of "Lorem Ipsum" cost almost nothing (low entropy),
 
 We welcome contributions that improve the accuracy of our metrics or add support for new IDEs/Editors.
 
-1.  Fork the Project
-2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your Changes (Yes, you'll need to pass the checks!)
-4.  Push to the Branch
-5.  Open a Pull Request
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (Yes, you'll need to pass the checks!)
+4. Push to the Branch
+5. Open a Pull Request
 
 ## 📄 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
+
 *Built with 🦀 Rust for the Sovereign Developer. 🛡️✨*
